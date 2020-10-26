@@ -35,11 +35,25 @@ class TestRepoCreator {
 
     TestRepoCreator(File directory) {
         repoDir = directory
+        if(repoDir.exists()) {
+            repoDir.deleteDir()
+        } else {
+            repoDir.mkdirs()
+        }
+
         git = Git.init().setDirectory(repoDir).call()
         log.info("created repo: " + git.getRepository().getDirectory())
         git.add().addFilepattern(".").call()
         git.commit().setMessage("Initial commit").call()
         log.info("Committed repository " + git.getRepository().getDirectory());
+    }
+
+    File getDirectory() {
+        return repoDir
+    }
+
+    String getDirectoryPath() {
+        return repoDir.absolutePath
     }
 
     String createCommits(String prefix, int count) {
@@ -85,7 +99,9 @@ class TestRepoCreator {
     }
 
     String removeBranch(String branchName) {
-        git.branchDelete().setBranchNames(Constants.R_HEADS + branchName).call();
+        def cmd = git.branchDelete()
+        cmd.force = true
+        cmd.setBranchNames(Constants.R_HEADS + branchName).call();
     }
 
     void createTag(String tagname, String msg, String rev) {

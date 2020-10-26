@@ -96,6 +96,7 @@ tasks {
         maxParallelForks = 1
 
         systemProperty("IDE_TEST_DEBUG_SUPPORT", "true")
+        systemProperty("ROOTDIR", project.layout.buildDirectory.get().asFile.absolutePath)
 
         if (!System.getenv("GITUSER").isNullOrBlank() &&
                 !System.getenv("GITPASSWD").isNullOrBlank() &&
@@ -116,7 +117,7 @@ tasks {
         //Change directory for gradle tests
         systemProperty("org.gradle.native.dir", ".gradle")
         //Set supported Gradle version
-        systemProperty("intershop.gradle.versions", "6.5,6.6")
+        systemProperty("intershop.gradle.versions", "6.6")
         //working dir for tests
         systemProperty("intershop.test.base.dir", (File(project.buildDir, "test-working")).absolutePath)
     }
@@ -290,6 +291,8 @@ dependencies {
 
     testRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.6")
     testRuntimeOnly("org.slf4j:slf4j-api:1.7.25")
+
+    testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
 
     testImplementation("com.intershop.gradle.test:test-gradle-plugin:3.1.0-dev.2")
     testImplementation(gradleTestKit())
