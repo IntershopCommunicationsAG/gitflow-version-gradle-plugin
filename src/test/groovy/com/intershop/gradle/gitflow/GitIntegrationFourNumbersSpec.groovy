@@ -21,7 +21,7 @@ import groovy.util.logging.Slf4j
 import org.eclipse.jgit.lib.Constants
 
 @Slf4j
-class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
+class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
     TestRepoCreator createTest1(File dir)  {
         TestRepoCreator creator = new TestRepoCreator(dir)

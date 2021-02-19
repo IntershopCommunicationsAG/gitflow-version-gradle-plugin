@@ -38,8 +38,12 @@ import java.util.stream.Collectors
  * The start parameter is the local source directory.
  * @constructor creates the service from a directory
  * @param directory local source directory
- */
-class GitVersionService(val directory: File) {
+ *
+ * @param versionType default value com.intershop.release.version.VersionType.fourDigits.
+*/
+
+class GitVersionService @JvmOverloads constructor(val directory: File,
+                                                  val versionType: VersionType = VersionType.fourDigits) {
 
     companion object {
         @JvmStatic
@@ -103,12 +107,6 @@ class GitVersionService(val directory: File) {
      * Default value is /.
      */
     var separator: String = "/"
-
-    /**
-     * Version type - three / four.
-     * Default value com.intershop.release.version.VersionType.fourDigits.
-     */
-    var versionType: VersionType = VersionType.fourDigits
 
     /**
      * Default version.
@@ -303,7 +301,12 @@ class GitVersionService(val directory: File) {
 
             if(tagRefs != null) {
                 tagRefs.forEach { ref ->
-                    return getVersionFromRef(ref, versionPrefix, Constants.R_TAGS).incrementHotfixVersion()
+                    val branchVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
+                    return if(versionType == VersionType.fourDigits) {
+                        branchVersion.incrementHotfixVersion()
+                    } else {
+                        branchVersion.incrementPatchVersion()
+                    }
                 }
             }
 
