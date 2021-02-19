@@ -205,247 +205,241 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         creator.createCommits("release7112", 2)
     }
 
-    def 'test 1 - no release'() {
+    def 'test 01 - no releases available'() {
         given:
-        println('+++ test 1 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
 
-        when: 'default version with SNAPSHOT'
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
         version == "1.0.0.0-SNAPSHOT"
+        println(" - master -> 1.0.0.0-SNAPSHOT")
 
-        when: 'dev version with SNAPSHOT'
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when: 'default version with branch name and SNAPSHOT'
-        println('--- on hotfix/JIRA-1')
+        when: 'on hotfix branch hotfix/JIRA-1'
         creator.setBranch("hotfix/JIRA-1")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is hotfix-<branch name>'
         version == "hotfix-JIRA-1-SNAPSHOT"
+        println(" - hotfix/JIRA-1 -> hotfix-JIRA-1-SNAPSHOT")
 
-        when: 'dev version with branch name and SNAPSHOT'
-        println('--- on feature/JIRA-2')
+        when: 'on feature branch feature/JIRA-2'
         creator.setBranch("feature/JIRA-2")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-2-SNAPSHOT"
+        println(" - feature/JIRA-2 -> feature-JIRA-2-SNAPSHOT")
     }
 
-    def 'test 2 - no release - hotfix 1 merge'() {
+    def 'test 02 - no release - hotfix 1 merge'() {
         given:
-        println('+++ test 2 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
 
-        when: 'default version with SNAPSHOT'
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
         version == "1.0.0.0-SNAPSHOT"
+        println(' - master -> 1.0.0.0-SNAPSHOT')
 
-        when: 'dev version with SNAPSHOT'
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(' - develop -> dev-SNAPSHOT')
 
-        when: 'dev version with branch name and SNAPSHOT'
-        println('--- feature/JIRA-2')
+        when: 'on feature branch feature/JIRA-2'
         creator.setBranch("feature/JIRA-2")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-2-SNAPSHOT"
+        println(" - feature/JIRA-2 -> feature-JIRA-2-SNAPSHOT")
 
-        when: 'dev version with branch name and SNAPSHOT'
-        println('--- feature/JIRA-3')
+        when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
     }
 
-    def 'test 3 - no release - release  branch with hotfix'() {
+    def 'test 03 - no release - release  branch with hotfix'() {
         given:
-        println('+++ test 3 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
 
-        when: 'default version with SNAPSHOT'
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
         version == "1.0.0.0-SNAPSHOT"
+        println(' - master -> 1.0.0.0-SNAPSHOT')
 
-        when: 'dev version with SNAPSHOT'
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when: 'version with rc and SNAPSHOT'
-        println('--- release/7.11.0')
+        when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is 7.11.0.0-SNAPSHOT'
         version == "7.11.0.0-SNAPSHOT"
+        println(" - release/7.11.0 -> 7.11.0.0-SNAPSHOT")
 
-        when: 'dev version with branch name and SNAPSHOT'
-        println('--- feature/JIRA-3')
+        when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
     }
 
-    def 'test 4 - no release - release  branch merged hotfix'() {
+    def 'test 04 - no release - release  branch merged hotfix'() {
         given:
-        println('+++ test 4 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
         addTest4(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
         version == "1.0.0.0-SNAPSHOT"
+        println(' - master -> 1.0.0.0-SNAPSHOT')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- release/7.11.0')
+        when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is 7.11.0.0-SNAPSHOT'
         version == "7.11.0.0-SNAPSHOT"
+        println(" - release/7.11.0 -> 7.11.0.0-SNAPSHOT")
 
-        when:
-        println('--- feature/JIRA-3')
+        when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
 
-        when:
-        println('--- hotfix/JIRA-4')
+        when: 'on hotfix branch hotfix/JIRA-4'
         creator.setBranch("hotfix/JIRA-4")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
         then:
         version == "hotfix-JIRA-4-SNAPSHOT"
+        println(" - hotfix/JIRA-4 -> hotfix-JIRA-4-SNAPSHOT")
     }
 
-    def 'test 5 - release - release branch ready'() {
+    def 'test 05 - release - release branch ready'() {
         given:
-        println('+++ test 5 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
         addTest4(creator)
         addTest5(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
         version == "1.0.0.0-SNAPSHOT"
+        println(' - master -> 1.0.0.0-SNAPSHOT')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- release/7.11.0')
+        when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is 7.11.0.0-SNAPSHOT'
         version == "7.11.0.0-SNAPSHOT"
+        println(" - release/7.11.0 -> 7.11.0.0-SNAPSHOT")
 
-        when:
-        println('--- feature/JIRA-3')
+        when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
 
-        when:
-        println('--- feature/JIRA-5')
+        when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
     }
 
-    def 'test 6 - release - release branch merged and taged'() {
+    def 'test 06 - release - release branch merged and taged, release branch still available'() {
         given:
-        println('+++ test 6 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -453,55 +447,54 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest5(creator)
         addTest6(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.0.0'
         version == "7.11.0.0"
+        println(' - master -> 7.11.0.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- release/7.11.0')
+        when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is 7.11.0.0-SNAPSHOT'
         version == "7.11.0.0-SNAPSHOT"
+        println(" - release/7.11.0 -> 7.11.0.0-SNAPSHOT")
 
-        when:
-        println('--- feature/JIRA-3')
+        when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
 
-        when:
-        println('--- feature/JIRA-5')
+        when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
     }
 
-    def 'test 61 - release, hotfix and features'() {
+    def 'test 06 - 1 - release and features, release branch removed'() {
         given:
-        println('+++ test 61 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -510,46 +503,45 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest6(creator)
         addTest61(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.0.0'
         version == "7.11.0.0"
+        println(' - master -> 7.11.0.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on feature/JIRA-3')
+        when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
 
-        when:
-        println('--- on feature/JIRA-5')
+        when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
     }
 
-    def 'test 7 - release, hotfix and features'() {
+    def 'test 07 - release, hotfix and features'() {
         given:
-        println('+++ test 7 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -559,55 +551,54 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest61(creator)
         addTest7(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.0.0'
         version == "7.11.0.0"
+        println(' - master -> 7.11.0.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on hotfix/JIRA-6')
+        when: 'on feature branch hotfix/JIRA-6'
         creator.setBranch("hotfix/JIRA-6")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is hotfix-<branch name>'
         version == "hotfix-JIRA-6-SNAPSHOT"
+        println(" - hotfix/JIRA-6 -> hotfix-JIRA-6-SNAPSHOT")
 
-        when:
-        println('--- on feature/JIRA-3')
+        when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
 
-        when:
-        println('--- on feature/JIRA-5')
+        when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
     }
 
-    def 'test 8 - release, feature merged'(){
+    def 'test 08 - release, feature merged'(){
         given:
-        println('+++ test 8 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -617,55 +608,54 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest7(creator)
         addTest8(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.0.0'
         version == "7.11.0.0"
+        println(' - master -> 7.11.0.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11.1')
+        when: 'on release branch release/7.11.1'
         creator.setBranch("release/7.11.1")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is 7.11.1.0-SNAPSHOT'
         version == "7.11.1.0-SNAPSHOT"
+        println(" - release/7.11.1 -> 7.11.1.0-SNAPSHOT")
 
-        when:
-        println('--- on hotfix/JIRA-6')
+        when: 'on feature branch hotfix/JIRA-6'
         creator.setBranch("hotfix/JIRA-6")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is hotfix-<branch name>'
         version == "hotfix-JIRA-6-SNAPSHOT"
+        println(" - hotfix/JIRA-6 -> hotfix-JIRA-6-SNAPSHOT")
 
-        when:
-        println('--- on feature/JIRA-5')
+        when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
     }
 
-    def 'test 9 - releases, release branch and feature'() {
+    def 'test 09 - releases, release branch and feature'() {
         given:
-        println('+++ test 9 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -676,46 +666,45 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest8(creator)
         addTest9(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.0.1'
         version == "7.11.0.1"
+        println(' - master -> 7.11.0.1')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11.1')
+        when: 'on release branch release/7.11.1'
         creator.setBranch("release/7.11.1")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is 7.11.1.0-SNAPSHOT'
         version == "7.11.1.0-SNAPSHOT"
+        println(" - release/7.11.1 -> 7.11.1.0-SNAPSHOT")
 
-        when:
-        println('--- on feature/JIRA-5')
+        when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
     }
 
     def 'test 10 - new release branch ready'() {
         given:
-        println('+++ test 10 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -727,46 +716,45 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest9(creator)
         addTest10(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.0.1'
         version == "7.11.0.1"
+        println(' - master -> 7.11.0.1')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11.1')
+        when: 'on release branch release/7.11.1'
         creator.setBranch("release/7.11.1")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is 7.11.1.0-SNAPSHOT'
         version == "7.11.1.0-SNAPSHOT"
+        println(" - release/7.11.1 -> 7.11.1.0-SNAPSHOT")
 
-        when:
-        println('--- on feature/JIRA-5')
+        when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is feature-<branch name>'
         version == "feature-JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
     }
 
     def 'test 11 - release branch merged'() {
         given:
-        println('+++ test 11 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -779,28 +767,27 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest10(creator)
         addTest11(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.0-SNAPSHOT'
         version == "7.11.1.0-SNAPSHOT"
+        println(' - master -> 7.11.1.0-SNAPSHOT')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
     }
 
     def 'test 12 - tagged und feature merged'() {
         given:
-        println('+++ test 12 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -814,28 +801,27 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest11(creator)
         addTest12(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.0'
         version == "7.11.1.0"
+        println(' - master -> 7.11.1.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
     }
 
     def 'test 13 - two release branches'() {
         given:
-        println('+++ test 13 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -850,48 +836,45 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest12(creator)
         addTest13(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.0'
         version == "7.11.1.0"
+        println(' - master -> 7.11.1.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-
-        when:
-        println('--- on release/7.11')
+        when: 'on release/7.11'
         creator.setBranch("release/7.11")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.0'
         version == "7.11.1.0"
+        println(' - on release/7.11 -> 7.11.1.0')
 
-
-        when:
-        println('--- on release/7.12')
+        when: 'on release/7.12'
         creator.setBranch("release/7.12.0")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.12.0.0-SNAPSHOT'
         version == "7.12.0.0-SNAPSHOT"
+        println(' - master -> 7.12.0.0-SNAPSHOT')
     }
 
     def 'test 14 - two release branches and one hotfix branch'() {
         given:
-        println('+++ test 14 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -907,56 +890,54 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest13(creator)
         addTest14(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.0'
         version == "7.11.1.0"
+        println(' - master -> 7.11.1.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11')
+        when: 'on release/7.11'
         creator.setBranch("release/7.11")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.1-SNAPSHOT'
         version == "7.11.1.1-SNAPSHOT"
+        println(' - on release/7.11 -> 7.11.1.1-SNAPSHOT')
 
-
-        when:
-        println('--- on release/7.12')
+        when: 'on release/7.12'
         creator.setBranch("release/7.12.0")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.12.0.0-SNAPSHOT'
         version == "7.12.0.0-SNAPSHOT"
+        println(' - master -> 7.12.0.0-SNAPSHOT')
 
-        when:
-        println('--- on hotfix/JIRA-7')
+        when: 'on feature branch hotfix/JIRA-7'
         creator.setBranch("hotfix/JIRA-7")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is hotfix-<branch name>'
         version == "hotfix-JIRA-7-SNAPSHOT"
+        println(" - hotfix/JIRA-7 -> hotfix-JIRA-7-SNAPSHOT")
     }
 
     def 'test 15 - new release branch merged'() {
         given:
-        println('+++ test 15 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -973,46 +954,45 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest14(creator)
         addTest15(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.12.0.0'
         version == "7.12.0.0"
+        println(' - master -> 7.12.0.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11')
+        when: 'on release/7.11'
         creator.setBranch("release/7.11")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.1-SNAPSHOT'
         version == "7.11.1.1-SNAPSHOT"
+        println(' - on release/7.11 -> 7.11.1.1-SNAPSHOT')
 
-        when:
-        println('--- on hotfix/JIRA-7')
+        when: 'on feature branch hotfix/JIRA-7'
         creator.setBranch("hotfix/JIRA-7")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is hotfix-<branch name>'
         version == "hotfix-JIRA-7-SNAPSHOT"
+        println(" - hotfix/JIRA-7 -> hotfix-JIRA-7-SNAPSHOT")
     }
 
     def 'test 16 - old release taged'() {
         given:
-        println('+++ test 16 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -1030,37 +1010,36 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest15(creator)
         addTest16(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.12.0.0'
         version == "7.12.0.0"
+        println(' - master -> 7.12.0.0')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11')
+        when: 'on release/7.11'
         creator.setBranch("release/7.11")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.1-SNAPSHOT'
         version == "7.11.1.1-SNAPSHOT"
+        println(' - on release/7.11 -> 7.11.1.1-SNAPSHOT')
     }
 
     def 'test 17 - two "master branches"'() {
         given:
-        println('+++ test 17 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -1079,37 +1058,36 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest16(creator)
         addTest17(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
 
-        then:
+        then: 'Version is 7.12.0.1-SNAPSHOT'
         version == "7.12.0.1-SNAPSHOT"
+        println(' - master -> 7.12.0.1-SNAPSHOT')
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11')
+        when: 'on release/7.11'
         creator.setBranch("release/7.11")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.1'
         version == "7.11.1.1"
+        println(' - on release/7.11 -> 7.11.1.1')
     }
 
-    def 'test 18 - two "master branches"'() {
+    def 'test 18 - two "master branches" - hotfix merged in 7.11'() {
         given:
-        println('+++ test 18 +++')
         TestRepoCreator creator = createTest1(testProjectDir)
         addTest2(creator)
         addTest3(creator)
@@ -1129,8 +1107,7 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         addTest17(creator)
         addTest18(creator)
 
-        when:
-        println('--- on master')
+        when: 'on master'
         creator.setBranch("master")
         GitVersionService gvs = new GitVersionService(creator.directory)
         String version = gvs.version
@@ -1138,22 +1115,22 @@ class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
         then:
         version == "7.12.0.1-SNAPSHOT"
 
-        when:
-        println('--- on develop')
+        when: 'on develop branch'
         creator.setBranch("develop")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'version is dev-SNAPSHOT'
         version == "dev-SNAPSHOT"
+        println(" - develop -> dev-SNAPSHOT")
 
-        when:
-        println('--- on release/7.11')
+        when: 'on release/7.11'
         creator.setBranch("release/7.11")
         gvs = new GitVersionService(creator.directory)
         version = gvs.version
 
-        then:
+        then: 'Version is 7.11.1.2-SNAPSHOT'
         version == "7.11.1.2-SNAPSHOT"
+        println(' - on release/7.11 -> 7.11.1.2-SNAPSHOT')
     }
 }

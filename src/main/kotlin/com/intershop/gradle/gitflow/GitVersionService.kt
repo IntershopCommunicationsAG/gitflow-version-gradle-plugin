@@ -23,6 +23,7 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevObject
 import org.eclipse.jgit.revwalk.RevWalk
 import org.slf4j.Logger
@@ -31,6 +32,13 @@ import java.io.File
 import java.io.IOException
 import java.util.stream.Collectors
 
+/**
+ * Calculate the version from a Git Repository.
+ * The repository uses GitFlow for the development.
+ * The start parameter is the local source directory.
+ * @constructor creates the service from a directory
+ * @param directory local source directory
+ */
 class GitVersionService(val directory: File) {
 
     companion object {
@@ -38,37 +46,77 @@ class GitVersionService(val directory: File) {
         private val log: Logger = LoggerFactory.getLogger(this::class.java.name)
     }
 
-    var client: Git
+    private var client: Git
 
     init {
         client = Git.open(directory)
     }
 
-    val repository: Repository by lazy {
+    private val repository: Repository by lazy {
         client.repository
     }
 
-    val branch: String by lazy {
+    private val branch: String by lazy {
         repository.branch
     }
 
+    // GitFlow configuration
+
+    /**
+     * Name of the main branch.
+     * Default value is master.
+     */
     var mainBranch: String = "master"
 
+    /**
+     * Name of the develop branch.
+     * Default value is develop.
+     */
     var developBranch: String = "develop"
 
+    /**
+     * Prefix of a hotfix branch.
+     * Default value is hotfix.
+     */
     var hotfixPrefix: String = "hotfix"
 
+    /**
+     * Prefix of a feature branch.
+     * Default value is feature.
+     */
     var featurePrefix: String = "feature"
 
+    /**
+     * Prefix of a release branch.
+     * Default value is release.
+     */
     var releasePrefix: String = "release"
 
+    /**
+     * Prefix of a version tag.
+     * Default value is version.
+     */
     var versionPrefix: String = "version"
 
+    /**
+     * Separator for prefix and branch name.
+     * Default value is /.
+     */
     var separator: String = "/"
 
-    var defaultVersion: Version = Version.Builder(VersionType.fourDigits).build()
+    /**
+     * Version type - three / four.
+     * Default value com.intershop.release.version.VersionType.fourDigits.
+     */
+    var versionType: VersionType = VersionType.fourDigits
 
-    val changed: Boolean by lazy {
+    /**
+     * Default version.
+     * Default value is Version.Builder(versionType).build().
+     */
+    var defaultVersion: Version = Version.Builder(versionType).build()
+
+    private val changed: Boolean by lazy {
         val status = client.status().call()
         val rv = status.untracked.size > 0 || status.uncommittedChanges.size > 0 ||
                 status.removed.size > 0 || status.added.size > 0 ||
@@ -100,6 +148,9 @@ class GitVersionService(val directory: File) {
         rv
     }
 
+    /**
+     * This is the calculated version of the Git repository.
+     */
     val version: String by lazy {
 
         val tag = getVersionTagFrom(Constants.HEAD)
@@ -123,18 +174,20 @@ class GitVersionService(val directory: File) {
                 }
                 branch.startsWith("${hotfixPrefix}${separator}") -> {
                     // version = hotfix/local-'branchname'-SNAPSHOT
-                    rv = "${getVersionForLocalChanges(hotfixPrefix, "local-${hotfixPrefix}")}-${getBranchNameForVersion(hotfixPrefix, branch)}-SNAPSHOT"
+                    rv = "${getVersionForLocalChanges(hotfixPrefix, 
+                        "local-${hotfixPrefix}")}-${getBranchNameForVersion(hotfixPrefix, branch)}-SNAPSHOT"
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
                     // version = feature/local-'branchname'-SNAPSHOT
-                    rv = "${getVersionForLocalChanges(featurePrefix, "local-${featurePrefix}")}-${getBranchNameForVersion(featurePrefix, branch)}-SNAPSHOT"
+                    rv = "${getVersionForLocalChanges(featurePrefix, 
+                        "local-${featurePrefix}")}-${getBranchNameForVersion(featurePrefix, branch)}-SNAPSHOT"
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
                     // version = 'branchname'-SNAPSHOT or increased version from tag ...
                     val vb = getLatestVersion()
                     rv = if(vb == defaultVersion) {
                         val branchName = getBranchNameForVersion(releasePrefix, branch)
-                        val vrb = Version.forString(branchName, VersionType.fourDigits)
+                        val vrb = Version.forString(branchName, versionType)
                         getVersionForLocalChanges("${vrb}-SNAPSHOT", "${vrb}-local-SNAPSHOT")
                     } else {
                         val addMetaData = getVersionForLocalChanges("", "local")
@@ -198,15 +251,31 @@ class GitVersionService(val directory: File) {
         return defaultVersion
     }
 
-    private fun getLatestVersionFromBranches(): Version? {
-        val branchList: Collection<Ref> = repository.getRefDatabase().getRefsByPrefix(Constants.R_HEADS)
-        val branches: MutableMap<ObjectId, List<Ref>> = branchList.stream().collect(Collectors.groupingBy(this::getObjectIdFromRef))
+    private fun getMapFrom(type: String): MutableMap<ObjectId, List<Ref>> {
+        val list: Collection<Ref> = repository.getRefDatabase().getRefsByPrefix(type)
+        val branchTags: MutableMap<ObjectId, List<Ref>> =
+            list.stream().collect(Collectors.groupingBy(this::getObjectIdFromRef))
 
-        val walk = RevWalk(repository)
+        return branchTags
+    }
+
+    private fun getLastCommit(walk: RevWalk): RevCommit? {
         val startCommit = walk.parseCommit(repository.resolve(Constants.HEAD))
         walk.markStart(startCommit)
+        val commit = walk.next()
 
-        var commit = walk.next()
+        return commit;
+    }
+
+    private fun getVersionFromRef(ref: Ref, prefix: String, type: String): Version {
+        val vStr = ref.name.substring(type.length).substring("${prefix}${separator}".length)
+        return Version.forString(vStr, versionType)
+    }
+
+    private fun getLatestVersionFromBranches(): Version? {
+        val branches: MutableMap<ObjectId, List<Ref>> = getMapFrom(Constants.R_HEADS)
+        val walk = RevWalk(repository)
+        var commit: RevCommit? = getLastCommit(walk)
         while( commit != null) {
             var branchRefs = branches[commit]
 
@@ -214,8 +283,7 @@ class GitVersionService(val directory: File) {
                 branchRefs.filter {
                     it.name.substring(Constants.R_HEADS.length).startsWith("${releasePrefix}${separator}")
                 }.forEach { ref ->
-                    val vStr = ref.name.substring(Constants.R_HEADS.length).substring("${releasePrefix}${separator}".length)
-                    return Version.forString(vStr, VersionType.fourDigits)
+                    return getVersionFromRef(ref, releasePrefix, Constants.R_HEADS)
                 }
             }
 
@@ -226,21 +294,16 @@ class GitVersionService(val directory: File) {
     }
 
     private fun getLatestVersionFromTags(): Version? {
-        val tagList: Collection<Ref> = repository.getRefDatabase().getRefsByPrefix(Constants.R_TAGS)
-        val tags: MutableMap<ObjectId, List<Ref>> = tagList.stream().collect(Collectors.groupingBy(this::getObjectIdFromRef))
-
+        val tags: MutableMap<ObjectId, List<Ref>> = getMapFrom(Constants.R_TAGS)
         val walk = RevWalk(repository)
-        val startCommit = walk.parseCommit(repository.resolve(Constants.HEAD))
-        walk.markStart(startCommit)
+        var commit = getLastCommit(walk)
 
-        var commit = walk.next()
         while( commit != null) {
             var tagRefs = tags[commit]
 
             if(tagRefs != null) {
                 tagRefs.forEach { ref ->
-                    val vStr = ref.name.substring(Constants.R_TAGS.length).substring("${versionPrefix}${separator}".length)
-                    return Version.forString(vStr, VersionType.fourDigits).incrementHotfixVersion()
+                    return getVersionFromRef(ref, versionPrefix, Constants.R_TAGS).incrementHotfixVersion()
                 }
             }
 
