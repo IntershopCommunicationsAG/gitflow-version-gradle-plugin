@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intershop.gradle.gitflow
+package com.intershop.gradle.gitflow.utils
 
 import com.intershop.release.version.Version
 import com.intershop.release.version.VersionType
@@ -60,7 +60,10 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
         client.repository
     }
 
-    private val branch: String by lazy {
+    /**
+     * This is the current branch name.
+     */
+    val branch: String by lazy {
         repository.branch
     }
 
@@ -200,6 +203,18 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
         rv
     }
 
+    /**
+     * This is the calculated previous version from the Git repository.
+     */
+    val previousVersion: String ?by lazy {
+        var pvstr: String? = null
+        val pv = getPreviousVersionFromTags()
+        if( pv != null) {
+            pvstr = pv.toString()
+        }
+        pvstr
+    }
+
     private fun getBranchNameForVersion(prefix: String, branchName: String): String {
         return branchName.substring("${prefix}${separator}".length)
     }
@@ -314,6 +329,43 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
         }
 
         return null
+    }
+
+    private fun getPreviousVersionFromTags(): Version? {
+        var previousVersion: Version? = null
+
+        if(branch == mainBranch || branch.startsWith("${releasePrefix}${separator}")) {
+
+            val tags: MutableMap<ObjectId, List<Ref>> = getMapFrom(Constants.R_TAGS)
+            val walk = RevWalk(repository)
+            var commit = getLastCommit(walk)
+            var found = 0
+            var commitNo = 0
+
+
+            while( commit != null && found < 2) {
+                var tagRefs = tags[commit]
+                if(tagRefs != null) {
+                    tagRefs.forEach { ref ->
+                        previousVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
+                        found = if(commitNo > 0) { 2 } else { found +1 }
+                    }
+                }
+                if(tagRefs == null && found == 0) {
+                    ++commitNo
+                }
+                commit = walk.next()
+            }
+
+            if(found == 1) {
+                previousVersion = null
+            }
+
+        } else {
+            log.info("It is not possible to calculate a previous version from branch '{}'", branch)
+        }
+
+        return previousVersion
     }
 
     private fun getObjectId(repository: Repository, rev: String): RevObject {

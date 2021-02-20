@@ -65,7 +65,7 @@ class TestRepoCreator {
             if (! file.createNewFile()) {
                 throw new IOException("Could not create file " + fileName)
             }
-            git.add().addFilepattern(fileName).call();
+            git.add().addFilepattern(fileName).call()
             RevCommit commit = git.commit().setMessage("Commit file " + fileName).call()
             rv = commit.getName()
             log.info("Committed file " + fileName + " to repository at " + git.getRepository().getDirectory())
@@ -118,5 +118,30 @@ class TestRepoCreator {
 
         Ref ref = cmd.call()
         log.info("Tag " + tagname + " created by jgit: " + ref)
+    }
+
+    void addBuildGroovyFile(String content) {
+        File buildFile = new File(repoDir, "build.gradle")
+        File settingsFile = new File(repoDir, "settings.gradle")
+        File gitIgnore = new File(repoDir,".gitignore")
+
+        buildFile << content
+
+        gitIgnore << """
+        # Gradle Files
+        .gradle
+        build/
+        """.stripIndent()
+
+        settingsFile << """
+        rootProject.name = 'test-project'
+        """.stripIndent()
+
+        git.add().addFilepattern(".gitignore").call()
+        git.add().addFilepattern("build.gradle").call()
+        git.add().addFilepattern("settings.gradle").call()
+
+        git.commit().setMessage("Commit gradle files").call()
+        log.info("Committed gradle files to repository at " + git.getRepository().getDirectory())
     }
 }

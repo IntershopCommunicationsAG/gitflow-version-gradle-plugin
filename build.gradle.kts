@@ -72,7 +72,7 @@ gradlePlugin {
     plugins {
         create("gitflowVersionPlugin") {
             id = pluginId
-            implementationClass = "com.intershop.gradle.scm.GitFlowVersionPlugin"
+            implementationClass = "com.intershop.gradle.gitflow.GitFlowVersionPlugin"
             displayName = project.name
             description = project.description
         }
@@ -115,7 +115,7 @@ tasks {
         //Change directory for gradle tests
         systemProperty("org.gradle.native.dir", ".gradle")
         //Set supported Gradle version
-        systemProperty("intershop.gradle.versions", "6.6")
+        systemProperty("intershop.gradle.versions", "6.8")
         //working dir for tests
         systemProperty("intershop.test.base.dir", (File(project.buildDir, "test-working")).absolutePath)
     }
