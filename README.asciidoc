@@ -12,6 +12,8 @@ image::images/gitflow_example.svg[]
 
 The version depends on the local repository and the current active branch and the tag. Furthermore, the plugin checks the local sources if there are uncommitted changes in the source repository.
 
+With the task `showVersion` it is possible to check the current version. Please switch to the info log level if you need more information about the calculation.
+
 == Plugin Extension "gitflowVersion"
 
 It is possible to configure the separator, prefixes and branch names and type of version. With one Gradle property it is possible to change the

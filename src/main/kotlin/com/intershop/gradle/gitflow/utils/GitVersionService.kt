@@ -42,19 +42,16 @@ import java.util.stream.Collectors
  * @param versionType default value com.intershop.release.version.VersionType.fourDigits.
 */
 
-class GitVersionService @JvmOverloads constructor(val directory: File,
-                                                  val versionType: VersionType = VersionType.fourDigits) {
+class GitVersionService @JvmOverloads constructor(
+    private val directory: File,
+    private val versionType: VersionType = VersionType.fourDigits) {
 
     companion object {
         @JvmStatic
         private val log: Logger = LoggerFactory.getLogger(this::class.java.name)
     }
 
-    private var client: Git
-
-    init {
-        client = Git.open(directory)
-    }
+    private var client: Git = Git.open(directory)
 
     private val repository: Repository by lazy {
         client.repository
@@ -283,19 +280,14 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
     }
 
     private fun getMapFrom(type: String): MutableMap<ObjectId, List<Ref>> {
-        val list: Collection<Ref> = repository.getRefDatabase().getRefsByPrefix(type)
-        val branchTags: MutableMap<ObjectId, List<Ref>> =
-            list.stream().collect(Collectors.groupingBy(this::getObjectIdFromRef))
-
-        return branchTags
+        val list: Collection<Ref> = repository.refDatabase.getRefsByPrefix(type)
+        return list.stream().collect(Collectors.groupingBy(this::getObjectIdFromRef))
     }
 
     private fun getLastCommit(walk: RevWalk): RevCommit? {
         val startCommit = walk.parseCommit(repository.resolve(Constants.HEAD))
         walk.markStart(startCommit)
-        val commit = walk.next()
-
-        return commit;
+        return walk.next()
     }
 
     private fun getVersionFromRef(ref: Ref, prefix: String, type: String): Version {
@@ -308,14 +300,12 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
         val walk = RevWalk(repository)
         var commit: RevCommit? = getLastCommit(walk)
         while( commit != null) {
-            var branchRefs = branches[commit]
+            val branchRefs = branches[commit]
 
-            if(branchRefs != null) {
-                branchRefs.filter {
-                    it.name.substring(Constants.R_HEADS.length).startsWith("${releasePrefix}${separator}")
-                }.forEach { ref ->
-                    return getVersionFromRef(ref, releasePrefix, Constants.R_HEADS)
-                }
+            branchRefs?.filter {
+                it.name.substring(Constants.R_HEADS.length).startsWith("${releasePrefix}${separator}")
+            }?.forEach { ref ->
+                return getVersionFromRef(ref, releasePrefix, Constants.R_HEADS)
             }
 
             commit = walk.next()
@@ -330,16 +320,13 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
         var commit = getLastCommit(walk)
 
         while( commit != null) {
-            var tagRefs = tags[commit]
 
-            if(tagRefs != null) {
-                tagRefs.forEach { ref ->
-                    val branchVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
-                    return if(versionType == VersionType.fourDigits) {
-                        branchVersion.incrementHotfixVersion()
-                    } else {
-                        branchVersion.incrementPatchVersion()
-                    }
+            tags[commit]?.forEach { ref ->
+                val branchVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
+                return if (versionType == VersionType.fourDigits) {
+                    branchVersion.incrementHotfixVersion()
+                } else {
+                    branchVersion.incrementPatchVersion()
                 }
             }
 
@@ -362,12 +349,10 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
 
 
             while( commit != null && found < 2) {
-                var tagRefs = tags[commit]
-                if(tagRefs != null) {
-                    tagRefs.forEach { ref ->
-                        previousVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
-                        found = if(commitNo > 0) { 2 } else { found +1 }
-                    }
+                val tagRefs = tags[commit]
+                tagRefs?.forEach { ref ->
+                    previousVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
+                    found = if(commitNo > 0) { 2 } else { found +1 }
                 }
                 if(tagRefs == null && found == 0) {
                     ++commitNo
@@ -395,12 +380,7 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
     @Throws(JGitInternalException::class)
     private fun getObjectIdFromRef(r: Ref): ObjectId {
         return try {
-            var key: ObjectId? = repository.getRefDatabase().peel(r).getPeeledObjectId()
-            if (key == null) {
-                r.objectId
-            } else {
-                key
-            }
+            repository.refDatabase.peel(r).peeledObjectId ?: r.objectId
         } catch (e: IOException) {
             throw JGitInternalException(e.message, e)
         }

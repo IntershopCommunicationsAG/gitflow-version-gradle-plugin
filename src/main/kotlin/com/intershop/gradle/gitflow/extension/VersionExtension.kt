@@ -179,6 +179,9 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         get() = versionTypeProperty.get()
         set(value) = versionTypeProperty.set(value)
 
+    /**
+     * This is the service for version calculation.
+     */
     val versionService: GitVersionService by lazy {
         val vType = if(versionType.toLowerCase() == "four" || versionType == "4") {
                         VersionType.fourDigits
@@ -200,7 +203,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
                                                              forUseAtConfigurationTime()
 
         if(localVersion.isPresent) {
-            versionService.localOnly = localVersion.get().toLowerCase().equals("true")
+            versionService.localOnly = localVersion.get().toLowerCase() == "true"
         } else {
             versionService.localOnly = false
         }
@@ -208,14 +211,23 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionService
     }
 
+    /**
+     * This is the version string.
+     */
     val version: String by lazy {
         this.versionService.version
     }
 
+    /**
+     * This is the previous version string.
+     */
     val previousVersion: String by lazy {
         this.versionService.previousVersion ?: ""
     }
 
+    /**
+     * This is the branch name.
+     */
     val branchName: String by lazy {
         this.versionService.branch
     }
