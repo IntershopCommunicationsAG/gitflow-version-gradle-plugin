@@ -45,7 +45,14 @@ class TestRepoCreator {
         log.info("created repo: " + git.getRepository().getDirectory())
         git.add().addFilepattern(".").call()
         git.commit().setMessage("Initial commit").call()
-        log.info("Committed repository " + git.getRepository().getDirectory());
+        log.info("Committed repository " + git.getRepository().getDirectory())
+    }
+
+    void renameBranch(String name) {
+        def renamecmd = git.branchRename()
+        renamecmd.oldName = "master"
+        renamecmd.newName = name
+        renamecmd.call()
     }
 
     File getDirectory() {

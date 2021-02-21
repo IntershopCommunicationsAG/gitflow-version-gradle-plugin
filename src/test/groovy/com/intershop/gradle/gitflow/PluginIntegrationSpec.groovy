@@ -15,14 +15,17 @@
  */
 package com.intershop.gradle.gitflow
 
+import com.intershop.gradle.gitflow.utils.GitCreatorChangedDefaultNames
+import com.intershop.gradle.gitflow.utils.GitCreatorThreeNumbers
 import com.intershop.gradle.gitflow.utils.TestRepoCreator
 import com.intershop.gradle.test.AbstractIntegrationGroovySpec
+import org.gradle.testkit.runner.TaskOutcome
 
 class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
     TestRepoCreator createTest1(File dir, String buildFileContent)  {
         TestRepoCreator creator = new TestRepoCreator(dir)
-        //add build filesx
+        //add build files
         creator.addBuildGroovyFile(buildFileContent)
 
         def cMaster = creator.createCommits("master", 2)
@@ -57,19 +60,66 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
             
         """.stripIndent()
 
-        TestRepoCreator creator = createTest1(testProjectDir, buildFileContent)
+        TestRepoCreator creator = GitCreatorThreeNumbers.initGitRepo(testProjectDir, buildFileContent)
         creator.setBranch("master")
 
         when:
-        List<String> args = ['showVersion', '-i', '-s']
+        List<String> args = [':showVersion', '-i', '-s']
 
         def result1 = getPreparedGradleRunner()
                 .withArguments(args)
-                //.withGradleVersion(gradleVersion)
+                .withGradleVersion(gradleVersion)
                 .build()
 
         then:
-            true
+        result1.output.contains("1.0.0-SNAPSHOT")
+        result1.output.contains("GitFlow previous version is not available!")
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
 
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'plugin configuration integration test'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.gitflowversion'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "trunk"
+                developBranch = "prerelease"
+                hotfixPrefix = "bugfix"
+                featurePrefix = "story"
+                releasePrefix = "prepared"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorChangedDefaultNames.initTest15(testProjectDir, buildFileContent)
+        creator.setBranch("trunk")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.output.contains("5.0.0")
+        result1.output.contains("4.1.0")
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+
+        where:
+        gradleVersion << supportedGradleVersions
     }
 }
