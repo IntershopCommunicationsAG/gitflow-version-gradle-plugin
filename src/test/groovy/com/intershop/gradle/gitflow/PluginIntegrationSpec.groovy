@@ -122,4 +122,40 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         where:
         gradleVersion << supportedGradleVersions
     }
+
+    def 'plugin for development'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.gitflowversion'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorThreeNumbers.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PlocalVersion=true']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.output.contains("local")
+        result1.output.contains("GitFlow previous version is not available!")
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
 }

@@ -21,6 +21,7 @@ import com.intershop.release.version.VersionType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import javax.inject.Inject
 
 /**
@@ -29,7 +30,8 @@ import javax.inject.Inject
  * @param layout directory layout
  */
 open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
-                                                layout: ProjectLayout) {
+                                                layout: ProjectLayout,
+                                                providerFactory: ProviderFactory ) {
 
     companion object {
         /**
@@ -193,6 +195,15 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionService.releasePrefix = releasePrefixProperty.get()
         versionService.versionPrefix = versionPrefixProperty.get()
         versionService.separator = separatorProperty.get()
+
+        val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion").
+                                                             forUseAtConfigurationTime()
+
+        if(localVersion.isPresent) {
+            versionService.localOnly = localVersion.get().toLowerCase().equals("true")
+        } else {
+            versionService.localOnly = false
+        }
 
         versionService
     }

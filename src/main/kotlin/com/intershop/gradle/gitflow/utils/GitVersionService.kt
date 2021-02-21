@@ -112,6 +112,11 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
     var separator: String = "/"
 
     /**
+     * Version can be set for development to local only.
+     */
+    var localOnly: Boolean = false
+
+    /**
      * Default version.
      * Default value is Version.Builder(versionType).build().
      */
@@ -156,6 +161,8 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
 
         val tag = getVersionTagFrom(Constants.HEAD)
         var rv = ""
+
+        if(! localOnly) {
             when {
                 tag.isNotBlank() -> {
                     rv = getVersionForLocalChanges(tag, "${tag}-local-SNAPSHOT")
@@ -175,24 +182,32 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
                 }
                 branch.startsWith("${hotfixPrefix}${separator}") -> {
                     // version = hotfix/local-'branchname'-SNAPSHOT
-                    rv = "${getVersionForLocalChanges(hotfixPrefix, 
-                        "local-${hotfixPrefix}")}-${getBranchNameForVersion(hotfixPrefix, branch)}-SNAPSHOT"
+                    rv = "${
+                        getVersionForLocalChanges(
+                            hotfixPrefix,
+                            "local-${hotfixPrefix}"
+                        )
+                    }-${getBranchNameForVersion(hotfixPrefix, branch)}-SNAPSHOT"
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
                     // version = feature/local-'branchname'-SNAPSHOT
-                    rv = "${getVersionForLocalChanges(featurePrefix, 
-                        "local-${featurePrefix}")}-${getBranchNameForVersion(featurePrefix, branch)}-SNAPSHOT"
+                    rv = "${
+                        getVersionForLocalChanges(
+                            featurePrefix,
+                            "local-${featurePrefix}"
+                        )
+                    }-${getBranchNameForVersion(featurePrefix, branch)}-SNAPSHOT"
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
                     // version = 'branchname'-SNAPSHOT or increased version from tag ...
                     val vb = getLatestVersion()
-                    rv = if(vb == defaultVersion) {
+                    rv = if (vb == defaultVersion) {
                         val branchName = getBranchNameForVersion(releasePrefix, branch)
                         val vrb = Version.forString(branchName, versionType)
                         getVersionForLocalChanges("${vrb}-SNAPSHOT", "${vrb}-local-SNAPSHOT")
                     } else {
                         val addMetaData = getVersionForLocalChanges("", "local")
-                        if(addMetaData.isNotBlank()) {
+                        if (addMetaData.isNotBlank()) {
                             vb.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
                         } else {
                             vb.toString()
@@ -200,6 +215,9 @@ class GitVersionService @JvmOverloads constructor(val directory: File,
                     }
                 }
             }
+        } else {
+            rv = "local"
+        }
         rv
     }
 
