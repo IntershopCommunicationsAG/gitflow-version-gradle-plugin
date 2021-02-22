@@ -66,12 +66,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val pluginId = "com.intershop.gradle.gitflowversion"
-
 gradlePlugin {
     plugins {
         create("gitflowVersionPlugin") {
-            id = pluginId
+            id = "com.intershop.gradle.gitflowversion"
             implementationClass = "com.intershop.gradle.gitflow.GitFlowVersionPlugin"
             displayName = project.name
             description = project.description
@@ -83,6 +81,11 @@ pluginBundle {
     website = "https://github.com/IntershopCommunicationsAG/${project.name}"
     vcsUrl = "https://github.com/IntershopCommunicationsAG/${project.name}"
     tags = listOf("intershop", "gradle", "plugin", "version", "release")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 // set correct project status
@@ -97,27 +100,11 @@ detekt {
 
 tasks {
     withType<Test>().configureEach {
-        testLogging.showStandardStreams = false
-
         maxParallelForks = 1
 
-        systemProperty("IDE_TEST_DEBUG_SUPPORT", "true")
-        systemProperty("ROOTDIR", project.layout.buildDirectory.get().asFile.absolutePath)
-
-        if (!System.getenv("GITUSER").isNullOrBlank() &&
-                !System.getenv("GITPASSWD").isNullOrBlank() &&
-                !System.getenv("GITURL").isNullOrBlank()) {
-            systemProperty("giturl", System.getenv("GITURL"))
-            systemProperty("gituser", System.getenv("GITUSER"))
-            systemProperty("gitpasswd", System.getenv("GITPASSWD"))
-        }
-
-        //Change directory for gradle tests
-        systemProperty("org.gradle.native.dir", ".gradle")
-        //Set supported Gradle version
         systemProperty("intershop.gradle.versions", "6.8")
-        //working dir for tests
-        systemProperty("intershop.test.base.dir", (File(project.buildDir, "test-working")).absolutePath)
+
+        dependsOn("jar")
     }
 
     val copyAsciiDoc = register<Copy>("copyAsciiDoc") {
@@ -177,7 +164,7 @@ tasks {
         jacocoTestReport.dependsOn("test")
     }
 
-    getByName("publishToMavenLocal")?.dependsOn("asciidoctor")
+    getByName("jar").dependsOn("asciidoctor")
 
     val compileKotlin by getting(KotlinCompile::class) {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
@@ -192,14 +179,14 @@ tasks {
         enabled = JavaVersion.current().isJava8
     }
 
-    val sourcesJar = task<Jar>("sourceJar") {
+    register<Jar>("sourceJar") {
         description = "Creates a JAR that contains the source code."
 
         from(sourceSets.getByName("main").allSource)
         archiveClassifier.set("sources")
     }
 
-    val javadocJar = task<Jar>("javadocJar") {
+    register<Jar>("javaDoc") {
         dependsOn(dokka)
         from(dokka)
         archiveClassifier.set("javadoc")
@@ -212,7 +199,7 @@ publishing {
 
             from(components["java"])
             artifact(tasks.getByName("sourceJar"))
-            artifact(tasks.getByName("javadocJar"))
+            artifact(tasks.getByName("javaDoc"))
 
             artifact(File(buildDir, "docs/asciidoc/html5/README.html")) {
                 classifier = "reference"
