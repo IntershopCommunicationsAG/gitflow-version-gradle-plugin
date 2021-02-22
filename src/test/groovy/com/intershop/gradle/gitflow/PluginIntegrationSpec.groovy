@@ -48,7 +48,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         given:
         def buildFileContent = """
             plugins {
-                id 'com.intershop.gradle.gitflowversion'
+                id 'com.intershop.gradle.version.gitflow'
             }
             
             gitflowVersion {
@@ -84,7 +84,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         given:
         def buildFileContent = """
             plugins {
-                id 'com.intershop.gradle.gitflowversion'
+                id 'com.intershop.gradle.version.gitflow'
             }
             
             gitflowVersion {
@@ -127,7 +127,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         given:
         def buildFileContent = """
             plugins {
-                id 'com.intershop.gradle.gitflowversion'
+                id 'com.intershop.gradle.version.gitflow'
             }
             
             gitflowVersion {

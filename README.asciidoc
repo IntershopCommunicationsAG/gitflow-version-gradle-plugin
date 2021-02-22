@@ -48,7 +48,7 @@ If the Gradle property "localVersion" is true, the version is always "local".
 [source,groovy]
 ----
 plugins {
-    id 'com.intershop.gradle.gitflowversion' version '{latestRevision}'
+    id 'com.intershop.gradle.version.gitflow' version '{latestRevision}'
 }
 
 gitflowVersion {
@@ -76,7 +76,7 @@ version = gitflowVersion.version
 [source,kotlin]
 ----
 plugins {
-    id("com.intershop.gradle.gitflowversion") version "{latestRevision}"
+    id("com.intershop.gradle.version.gitflow") version "{latestRevision}"
 }
 
 gitflowVersion {

@@ -49,7 +49,7 @@ plugins {
 }
 
 // release configuration
-group = "com.intershop.gradle.scm"
+group = "com.intershop.gradle.version"
 description = "Gradle SCM version plugin - SCM based version handling for Gradle"
 version = "1.0.0"
 
@@ -69,7 +69,7 @@ java {
 gradlePlugin {
     plugins {
         create("gitflowVersionPlugin") {
-            id = "com.intershop.gradle.gitflowversion"
+            id = "com.intershop.gradle.version.gitflow"
             implementationClass = "com.intershop.gradle.gitflow.GitFlowVersionPlugin"
             displayName = project.name
             description = project.description
