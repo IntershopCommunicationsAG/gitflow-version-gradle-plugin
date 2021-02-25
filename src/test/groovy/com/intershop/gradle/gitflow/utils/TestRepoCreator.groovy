@@ -24,6 +24,7 @@ import org.eclipse.jgit.api.TagCommand
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.revwalk.RevObject
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.lib.Constants
 
@@ -86,8 +87,11 @@ class TestRepoCreator {
         git.checkout().setName(branchName).call()
     }
 
-    void setBranch(String branchName) {
-        git.checkout().setName(branchName).call()
+    String setBranch(String branchName) {
+        Ref returnValue = git.checkout().setName(branchName).call()
+        RevWalk walk = new RevWalk(git.repository)
+        RevObject rv = walk.parseAny(returnValue.objectId)
+        return rv.name()
     }
 
     String merge(String targetBranch, String srcBranch, String msg) {
@@ -150,5 +154,9 @@ class TestRepoCreator {
 
         git.commit().setMessage("Commit gradle files").call()
         log.info("Committed gradle files to repository at " + git.getRepository().getDirectory())
+    }
+
+    void gitidCheckout(String id) {
+        git.checkout().setName( id ).call()
     }
 }

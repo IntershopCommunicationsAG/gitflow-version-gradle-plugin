@@ -61,7 +61,8 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         """.stripIndent()
 
         TestRepoCreator creator = GitCreatorThreeNumbers.initGitRepo(testProjectDir, buildFileContent)
-        creator.setBranch("master")
+        String cid = creator.setBranch("master")
+        creator.gitidCheckout(cid)
 
         when:
         List<String> args = [':showVersion', '-i', '-s']
@@ -104,7 +105,8 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         """.stripIndent()
 
         TestRepoCreator creator = GitCreatorChangedDefaultNames.initTest15(testProjectDir, buildFileContent)
-        creator.setBranch("trunk")
+        String cid = creator.setBranch("trunk")
+        creator.gitidCheckout(cid)
 
         when:
         List<String> args = [':showVersion', '-i', '-s']
@@ -140,7 +142,8 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         """.stripIndent()
 
         TestRepoCreator creator = GitCreatorThreeNumbers.initGitRepo(testProjectDir, buildFileContent)
-        creator.setBranch("master")
+        String cid = creator.setBranch("master")
+        creator.gitidCheckout(cid)
 
         when:
         List<String> args = [':showVersion', '-i', '-s', '-PlocalVersion=true']
