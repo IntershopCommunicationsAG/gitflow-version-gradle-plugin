@@ -77,6 +77,20 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         result1.output.contains("GitFlow previous version is not available!")
         result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
 
+        when:
+        List<String> args2 = [':createChangeLog', '-i', '-s']
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args2)
+                .withGradleVersion(gradleVersion)
+                .build()
+        File resultFile = new File(testProjectDir, "build/changelog/changelog.md")
+
+        then:
+        result2.task(":createChangeLog").outcome == TaskOutcome.SUCCESS
+        resultFile.exists()
+        resultFile.text.contains("This list contains changes since beginning.")
+
         where:
         gradleVersion << supportedGradleVersions
     }
@@ -120,6 +134,20 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         result1.output.contains("5.0.0")
         result1.output.contains("4.1.0")
         result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+
+        when:
+        List<String> args2 = [':createChangeLog', '-i', '-s']
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args2)
+                .withGradleVersion(gradleVersion)
+                .build()
+        File resultFile = new File(testProjectDir, "build/changelog/changelog.md")
+
+        then:
+        result2.task(":createChangeLog").outcome == TaskOutcome.SUCCESS
+        resultFile.exists()
+        resultFile.text.contains("This list contains changes since 4.1.0.")
 
         where:
         gradleVersion << supportedGradleVersions

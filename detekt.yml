@@ -57,7 +57,7 @@ complexity:
   active: true
   ComplexCondition:
     active: true
-    threshold: 5
+    threshold: 7
   ComplexInterface:
     active: false
     threshold: 10
@@ -80,7 +80,8 @@ complexity:
     threshold: 60
   LongParameterList:
     active: true
-    threshold: 6
+    functionThreshold: 5
+    constructorThreshold: 5
     ignoreDefaultParameters: false
   MethodOverloading:
     active: false
@@ -98,11 +99,11 @@ complexity:
   TooManyFunctions:
     active: true
     excludes: "**/test/**,**/androiTooManyFunctionsdTest/**,**/*.Test.kt,**/*.Spec.kt,**/*.Spek.kt"
-    thresholdInFiles: 14
-    thresholdInClasses: 14
-    thresholdInInterfaces: 14
-    thresholdInObjects: 14
-    thresholdInEnums: 14
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInInterfaces: 20
+    thresholdInObjects: 20
+    thresholdInEnums: 20
     ignoreDeprecated: false
     ignorePrivate: false
     ignoreOverridden: false

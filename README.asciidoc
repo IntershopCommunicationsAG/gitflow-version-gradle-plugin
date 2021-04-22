@@ -111,6 +111,15 @@ Example: branch name is feature/branch-name -> 'branch-name-SNAPSHOT'
 The version is calculated from the branch name and extended with SNAPSHOT.
 Example: release/7.11 -> '7.11.0.0-SNAPSHOT' (Version type is 'four')
 
+== Tasks
+
+[cols="20%,15%,65%", width="95%", options="header"]
+|===
+|Task name  |Type             |Description
+
+| showVersion    | ShowVersion    | Shows the current version and the previous version of the current working copy.
+| createChangLog | CreateChangLog | Creates a changelog for the current working copy, starting with the previous version or with the first commit, if there is no previous version.
+|===
 
 == License
 

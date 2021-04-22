@@ -22,12 +22,10 @@ import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Ref
-import org.eclipse.jgit.lib.RefDatabase
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevObject
 import org.eclipse.jgit.revwalk.RevWalk
-import org.eclipse.jgit.treewalk.TreeWalk
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -53,9 +51,15 @@ class GitVersionService @JvmOverloads constructor(
         private val log: Logger = LoggerFactory.getLogger(this::class.java.name)
     }
 
-    private var client: Git = Git.open(directory)
+    /**
+     * Git client for the existing working copy.
+     */
+    val client: Git = Git.open(directory)
 
-    private val repository: Repository by lazy {
+    /**
+     * Repository for the existing working copy.
+     */
+    val repository: Repository by lazy {
         client.repository
     }
 
@@ -239,7 +243,7 @@ class GitVersionService @JvmOverloads constructor(
                         branches.contains(mainBranch) -> versionFromMainBranch()
                         branches.contains(developBranch) -> versionFromDevBranch()
                         branches.contains(releasePrefix) -> {
-                            val bn = branches.filter { it.startsWith("${releasePrefix}${separator}") } .first()
+                            val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)
                         }
                         else -> "version-SNAPSHOT"
@@ -251,6 +255,17 @@ class GitVersionService @JvmOverloads constructor(
         }
         rv
     }
+
+    /**
+     * The revision id from the working copy (read only).
+     *
+     * @property revID revision id
+     */
+    val revID: String
+        get() {
+            val id = repository.resolve(Constants.HEAD)
+            return if(id != null) { id.name } else { "" }
+        }
 
     private fun getBranchListForRef() : List<String> {
         val reflist = repository.refDatabase.refs
@@ -274,6 +289,33 @@ class GitVersionService @JvmOverloads constructor(
             pvstr = pv.toString()
         }
         pvstr
+    }
+
+    /**
+     * Calculates the commit for a specified version.
+     *
+     * @param version is the a version
+     */
+    fun getRevObjectFrom(version: Version) : RevCommit? {
+        val tags: MutableMap<ObjectId, List<Ref>> = getMapFrom(Constants.R_TAGS)
+        val walk = RevWalk(repository)
+        var commit = getLastCommit(walk)
+        var found = false
+
+        var result: RevCommit? = null
+
+        while( commit != null && ! found ) {
+            val tagRefs = tags[commit]
+            tagRefs?.forEach { ref ->
+                if(version == getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)) {
+                    result = commit
+                    found = true
+                }
+            }
+            commit = walk.next()
+        }
+
+        return result
     }
 
     private fun getBranchNameForVersion(prefix: String, branchName: String): String {
@@ -386,14 +428,14 @@ class GitVersionService @JvmOverloads constructor(
         var previousVersion: Version? = null
         var calcPrevVer = false
 
-        if(! branch.startsWith(featurePrefix) &&
+        calcPrevVer = if(! branch.startsWith(featurePrefix) &&
             ! branch.startsWith(hotfixPrefix) &&
             ! branch.startsWith(releasePrefix) &&
-              branch != developBranch &&  branch != mainBranch) {
+            branch != developBranch &&  branch != mainBranch) {
             val list = getBranchListForRef()
-            calcPrevVer = (list.contains(mainBranch) || list.filter { it.startsWith(releasePrefix) } .size > 0 )
+            (list.contains(mainBranch) || list.filter { it.startsWith(releasePrefix) }.isNotEmpty())
         } else {
-            calcPrevVer = (branch == mainBranch || branch.startsWith("${releasePrefix}${separator}"))
+            (branch == mainBranch || branch.startsWith("${releasePrefix}${separator}"))
         }
 
         if(calcPrevVer) {

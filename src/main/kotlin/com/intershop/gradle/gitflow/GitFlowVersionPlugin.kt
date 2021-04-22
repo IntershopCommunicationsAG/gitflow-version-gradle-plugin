@@ -17,6 +17,7 @@ package com.intershop.gradle.gitflow
 
 import com.intershop.gradle.gitflow.extension.VersionExtension.Companion.VERSION_EXTENSION_NAME
 import com.intershop.gradle.gitflow.extension.VersionExtension
+import com.intershop.gradle.gitflow.tasks.CreateChangeLog
 import com.intershop.gradle.gitflow.tasks.ShowVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -30,11 +31,14 @@ open class GitFlowVersionPlugin: Plugin<Project> {
         with(project.rootProject) {
             logger.info("GitFlow version plugin will be initialized")
 
-            extensions.findByType(
+            val ext = extensions.findByType(
                 VersionExtension::class.java
             ) ?: extensions.create(VERSION_EXTENSION_NAME, VersionExtension::class.java)
 
             tasks.register("showVersion", ShowVersion::class.java)
+            tasks.register("createChangeLog", CreateChangeLog::class.java) {
+                it.preVersion = ext.previousVersion
+            }
         }
     }
 }
