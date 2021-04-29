@@ -162,8 +162,8 @@ class GitVersionService @JvmOverloads constructor(
         val addMetaData = getVersionForLocalChanges("", "local")
 
         return when {
-            vm == defaultVersion && addMetaData.isEmpty() -> vm.setBranchMetadata("SNAPSHOT").toString()
-            addMetaData.isNotBlank() -> vm.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
+            vm == defaultVersion && addMetaData.isEmpty() -> vm.setBuildMetadata("SNAPSHOT").toString()
+            addMetaData.isNotBlank() -> vm.setBranchMetadata(addMetaData).setBuildMetadata("SNAPSHOT").toString()
             else -> vm.toString()
         }
     }
@@ -306,7 +306,9 @@ class GitVersionService @JvmOverloads constructor(
 
         while( commit != null && ! found ) {
             val tagRefs = tags[commit]
-            tagRefs?.forEach { ref ->
+            tagRefs?.filter {
+                it.name.substring(Constants.R_TAGS.length).startsWith("${versionPrefix}${separator}")
+            }?.forEach { ref ->
                 if(version == getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)) {
                     result = commit
                     found = true
@@ -353,15 +355,15 @@ class GitVersionService @JvmOverloads constructor(
         val tagVersion = getLatestVersionFromTags()
 
         if(tagVersion == null && branchesVersion != null) {
-            return branchesVersion.setBranchMetadata("SNAPSHOT")
+            return branchesVersion.setBuildMetadata("SNAPSHOT")
         }
 
         if(tagVersion != null && branchesVersion != null && tagVersion < branchesVersion) {
-            return branchesVersion.setBranchMetadata("SNAPSHOT")
+            return branchesVersion.setBuildMetadata("SNAPSHOT")
         }
 
         if(tagVersion != null) {
-            return tagVersion.setBranchMetadata("SNAPSHOT")
+            return tagVersion.setBuildMetadata("SNAPSHOT")
         }
 
         return defaultVersion
@@ -408,8 +410,9 @@ class GitVersionService @JvmOverloads constructor(
         var commit = getLastCommit(walk)
 
         while( commit != null) {
-
-            tags[commit]?.forEach { ref ->
+            tags[commit]?.filter {
+                it.name.substring(Constants.R_TAGS.length).startsWith("${versionPrefix}${separator}")
+            }?.forEach { ref ->
                 val branchVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
                 return if (versionType == VersionType.fourDigits) {
                     branchVersion.incrementHotfixVersion()
@@ -449,8 +452,10 @@ class GitVersionService @JvmOverloads constructor(
 
             while( commit != null && found < 2) {
                 val tagRefs = tags[commit]
-                tagRefs?.forEach { ref ->
-                    previousVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
+                tagRefs?.filter {
+                    it.name.substring(Constants.R_TAGS.length).startsWith("${versionPrefix}${separator}")
+                }?.forEach { ref ->
+                        previousVersion = getVersionFromRef(ref, versionPrefix, Constants.R_TAGS)
                     found = if(commitNo > 0) { 2 } else { found +1 }
                 }
                 if(tagRefs == null && found == 0) {
