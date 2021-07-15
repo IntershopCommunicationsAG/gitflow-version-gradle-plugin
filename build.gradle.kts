@@ -39,19 +39,19 @@ plugins {
     id("org.asciidoctor.jvm.convert") version "3.3.0"
 
     // documentation
-    id("org.jetbrains.dokka") version "0.10.1"
+    id("org.jetbrains.dokka") version "1.4.32"
 
     // code analysis for kotlin
-    id("io.gitlab.arturbosch.detekt") version "1.15.0"
+    id("io.gitlab.arturbosch.detekt") version "1.17.1"
 
     // plugin for publishing to Gradle Portal
-    id("com.gradle.plugin-publish") version "0.12.0"
+    id("com.gradle.plugin-publish") version "0.15.0"
 }
 
 // release configuration
 group = "com.intershop.gradle.version"
 description = "Gradle SCM version plugin - SCM based version handling for Gradle"
-version = "1.1.1"
+version = "1.2.0"
 
 val sonatypeUsername: String by project
 val sonatypePassword: String? by project
@@ -169,13 +169,8 @@ tasks {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    val dokka by existing(DokkaTask::class) {
-        outputFormat = "javadoc"
-        outputDirectory = "$buildDir/javadoc"
-
-        // Java 8 is only version supported both by Oracle/OpenJDK and Dokka itself
-        // https://github.com/Kotlin/dokka/issues/294
-        enabled = JavaVersion.current().isJava8
+    dokkaJavadoc.configure {
+        outputDirectory.set(buildDir.resolve("dokka"))
     }
 
     register<Jar>("sourceJar") {
@@ -186,8 +181,8 @@ tasks {
     }
 
     register<Jar>("javaDoc") {
-        dependsOn(dokka)
-        from(dokka)
+        dependsOn(dokkaJavadoc)
+        from(dokkaJavadoc)
         archiveClassifier.set("javadoc")
     }
 }
@@ -273,9 +268,5 @@ dependencies {
     testImplementation(gradleTestKit())
 
     testImplementation("commons-io:commons-io:2.2")
-}
-
-repositories {
-    jcenter()
 }
 
