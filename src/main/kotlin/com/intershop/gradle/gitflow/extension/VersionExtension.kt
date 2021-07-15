@@ -219,6 +219,14 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     }
 
     /**
+     * This is the version for containers.
+     * There is no "Snapshot"
+     */
+    val containerVersion: String by lazy {
+        this.versionService.containerVersion
+    }
+
+    /**
      * This is the previous version string.
      */
     val previousVersion: String by lazy {

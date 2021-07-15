@@ -16,6 +16,7 @@
 package com.intershop.gradle.gitflow
 
 import com.intershop.gradle.gitflow.utils.GitCreatorChangedDefaultNames
+import com.intershop.gradle.gitflow.utils.GitCreatorSpecialPath
 import com.intershop.gradle.gitflow.utils.GitCreatorThreeNumbers
 import com.intershop.gradle.gitflow.utils.TestRepoCreator
 import com.intershop.gradle.test.AbstractIntegrationGroovySpec
@@ -90,6 +91,60 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         result2.task(":createChangeLog").outcome == TaskOutcome.SUCCESS
         resultFile.exists()
         resultFile.text.contains("This list contains changes since beginning.")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test path with team'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("hotfix-team1_12345-message-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions

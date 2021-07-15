@@ -157,51 +157,60 @@ class GitVersionService @JvmOverloads constructor(
         rv
     }
 
-    private fun versionFromMainBranch() : String {
+    private fun versionFromMainBranch(isContainer: Boolean) : String {
         val vm = getLatestVersion()
         val addMetaData = getVersionForLocalChanges("", "local")
 
         return when {
-            vm == defaultVersion && addMetaData.isEmpty() -> vm.setBuildMetadata("SNAPSHOT").toString()
-            addMetaData.isNotBlank() -> vm.setBranchMetadata(addMetaData).setBuildMetadata("SNAPSHOT").toString()
+            vm == defaultVersion && addMetaData.isEmpty() && !isContainer -> vm.setBuildMetadata("SNAPSHOT").toString()
+            addMetaData.isNotBlank() -> if(isContainer) {
+                                            vm.setBranchMetadata(addMetaData).toString()
+                                        } else {
+                                            vm.setBranchMetadata(addMetaData).setBuildMetadata("SNAPSHOT").toString()
+                                        }
             else -> vm.toString()
         }
     }
 
-    private fun versionFromDevBranch() : String {
-        return "${getVersionForLocalChanges("dev", "local-dev")}-SNAPSHOT"
+    private fun versionFromDevBranch(isContainer: Boolean) : String {
+        return if(isContainer) {
+            getVersionForLocalChanges("dev", "local-dev")
+        } else {
+            "${getVersionForLocalChanges("dev", "local-dev")}-SNAPSHOT"
+        }
+
     }
 
-    private fun versionFromHotfix() : String {
+    private fun versionFromHotfix(isContainer: Boolean) : String {
         // version = hotfix/local-'branchname'-SNAPSHOT
-        return "${
-            getVersionForLocalChanges(
-                hotfixPrefix,
-                "local-${hotfixPrefix}"
-            )
-        }-${getBranchNameForVersion(hotfixPrefix, branch)}-SNAPSHOT"
+        val v = "${ getVersionForLocalChanges( hotfixPrefix, "local-${hotfixPrefix}"
+                            )}-${getBranchNameForVersion(hotfixPrefix, branch)}"
+        return if(isContainer) { v } else { "${ v }-SNAPSHOT" }
     }
 
-    private fun versionFromFeature() : String {
-        return "${
-            getVersionForLocalChanges(
-                featurePrefix,
-                "local-${featurePrefix}"
-            )
-        }-${getBranchNameForVersion(featurePrefix, branch)}-SNAPSHOT"
+    private fun versionFromFeature(isContainer: Boolean) : String {
+        val v = "${ getVersionForLocalChanges( featurePrefix, "local-${featurePrefix}"
+                            )}-${getBranchNameForVersion(featurePrefix, branch)}"
+
+        return if(isContainer) { v } else { "${ v }-SNAPSHOT" }
     }
 
-    private fun versionFromRelease() : String {
+    private fun versionFromRelease(isContainer: Boolean) : String {
         // version = 'branchname'-SNAPSHOT or increased version from tag ...
         val vb = getLatestVersion()
         return if (vb == defaultVersion) {
             val branchName = getBranchNameForVersion(releasePrefix, branch)
             val vrb = Version.forString(branchName, versionType)
-            getVersionForLocalChanges("${vrb}-SNAPSHOT", "${vrb}-local-SNAPSHOT")
+            val v = getVersionForLocalChanges("${vrb}", "${vrb}-local")
+            if(isContainer) { v } else { "${ v }-SNAPSHOT" }
         } else {
             val addMetaData = getVersionForLocalChanges("", "local")
             if (addMetaData.isNotBlank()) {
-                vb.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
+                if(isContainer) {
+                    vb.setBranchMetadata(addMetaData).toString()
+                } else {
+                    vb.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
+                }
             } else {
                 vb.toString()
             }
@@ -222,26 +231,26 @@ class GitVersionService @JvmOverloads constructor(
                     rv = getVersionForLocalChanges(tag, "${tag}-local-SNAPSHOT")
                 }
                 branch == mainBranch -> {
-                    rv = versionFromMainBranch()
+                    rv = versionFromMainBranch(false)
                 }
                 branch == developBranch -> {
-                    rv = versionFromDevBranch()
+                    rv = versionFromDevBranch(false)
                 }
                 branch.startsWith("${hotfixPrefix}${separator}") -> {
-                    rv = versionFromHotfix()
+                    rv = versionFromHotfix(false)
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
                     // version = feature/local-'branchname'-SNAPSHOT
-                    rv = versionFromFeature()
+                    rv = versionFromFeature(false)
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
-                    rv = versionFromRelease()
+                    rv = versionFromRelease(false)
                 }
                 else -> {
                     val branches = getBranchListForRef()
                     rv = when {
-                        branches.contains(mainBranch) -> versionFromMainBranch()
-                        branches.contains(developBranch) -> versionFromDevBranch()
+                        branches.contains(mainBranch) -> versionFromMainBranch(false)
+                        branches.contains(developBranch) -> versionFromDevBranch(false)
                         branches.contains(releasePrefix) -> {
                             val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)
@@ -253,6 +262,52 @@ class GitVersionService @JvmOverloads constructor(
         } else {
             rv = "local"
         }
+        rv
+    }
+
+    /**
+     * This is the calculated containerVersion of the Git repository.
+     */
+    val containerVersion: String by lazy {
+        val tag = getVersionTagFrom(Constants.HEAD)
+        var rv = ""
+
+        if(! localOnly) {
+            when {
+                tag.isNotBlank() -> {
+                    rv = getVersionForLocalChanges(tag, "${tag}-local")
+                }
+                branch == mainBranch -> {
+                    rv = versionFromMainBranch(true)
+                }
+                branch == developBranch -> {
+                    rv = versionFromDevBranch(true)
+                }
+                branch.startsWith("${hotfixPrefix}${separator}") -> {
+                    rv = versionFromHotfix(true)
+                }
+                branch.startsWith("${featurePrefix}${separator}") -> {
+                    // version = feature/local-'branchname'-SNAPSHOT
+                    rv = versionFromFeature(true)
+                }
+                branch.startsWith("${releasePrefix}${separator}") -> {
+                    rv = versionFromRelease(true)
+                }
+                else -> {
+                    val branches = getBranchListForRef()
+                    rv = when {
+                        branches.contains(mainBranch) -> versionFromMainBranch(true)
+                        branches.contains(developBranch) -> versionFromDevBranch(true)
+                        branches.contains(releasePrefix) -> {
+                            val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
+                            getBranchNameForVersion(releasePrefix, bn)
+                        }
+                        else -> "latest"
+                    }
+                }
+            }
+        }
+
         rv
     }
 
@@ -321,7 +376,7 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun getBranchNameForVersion(prefix: String, branchName: String): String {
-        return branchName.substring("${prefix}${separator}".length)
+        return branchName.substring("${prefix}${separator}".length).replace("/", "_")
     }
 
     private fun getVersionForLocalChanges(version: String, alt: String): String {
@@ -429,9 +484,8 @@ class GitVersionService @JvmOverloads constructor(
 
     private fun getPreviousVersionFromTags(): Version? {
         var previousVersion: Version? = null
-        var calcPrevVer = false
 
-        calcPrevVer = if(! branch.startsWith(featurePrefix) &&
+        var calcPrevVer = if(! branch.startsWith(featurePrefix) &&
             ! branch.startsWith(hotfixPrefix) &&
             ! branch.startsWith(releasePrefix) &&
             branch != developBranch &&  branch != mainBranch) {

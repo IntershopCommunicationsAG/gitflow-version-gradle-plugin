@@ -102,9 +102,8 @@ tasks {
     withType<Test>().configureEach {
         maxParallelForks = 1
 
-        systemProperty("intershop.gradle.versions", "6.8")
-
-        dependsOn("jar")
+        systemProperty("intershop.gradle.versions", "7.1")
+        useJUnitPlatform()
     }
 
     val copyAsciiDoc = register<Copy>("copyAsciiDoc") {
@@ -262,7 +261,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     //jgit
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r") {
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r") {
         exclude(group = "org.apache.httpcomponents", module = "httpclient")
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
@@ -270,9 +269,7 @@ dependencies {
     testRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.6")
     testRuntimeOnly("org.slf4j:slf4j-api:1.7.25")
 
-    testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
-
-    testImplementation("com.intershop.gradle.test:test-gradle-plugin:3.7.0")
+    testImplementation("com.intershop.gradle.test:test-gradle-plugin:4.1.1")
     testImplementation(gradleTestKit())
 
     testImplementation("commons-io:commons-io:2.2")
