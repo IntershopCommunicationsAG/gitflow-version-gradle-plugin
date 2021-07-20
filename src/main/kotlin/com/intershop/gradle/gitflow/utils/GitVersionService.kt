@@ -30,6 +30,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
+import java.math.BigInteger
+import java.security.MessageDigest
 import java.util.stream.Collectors
 
 /**
@@ -120,6 +122,12 @@ class GitVersionService @JvmOverloads constructor(
     var localOnly: Boolean = false
 
     /**
+     * Version is shortened for branches and hotfixes
+     * with an hash for the string if shortened is true.
+     */
+    var shortened: Boolean = false
+
+    /**
      * Default version.
      * Default value is Version.Builder(versionType).build().
      */
@@ -182,15 +190,14 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun versionFromHotfix(isContainer: Boolean) : String {
-        // version = hotfix/local-'branchname'-SNAPSHOT
-        val v = "${ getVersionForLocalChanges( hotfixPrefix, "local-${hotfixPrefix}"
-                            )}-${getBranchNameForVersion(hotfixPrefix, branch)}"
+        val v = "${ getVersionForLocalChanges( "", "local-" 
+                            )}${getBranchNameForVersion(hotfixPrefix, branch)}"
         return if(isContainer) { v } else { "${ v }-SNAPSHOT" }
     }
 
     private fun versionFromFeature(isContainer: Boolean) : String {
-        val v = "${ getVersionForLocalChanges( featurePrefix, "local-${featurePrefix}"
-                            )}-${getBranchNameForVersion(featurePrefix, branch)}"
+        val v = "${ getVersionForLocalChanges( "", "local-"
+                            )}${getBranchNameForVersion(featurePrefix, branch)}"
 
         return if(isContainer) { v } else { "${ v }-SNAPSHOT" }
     }
@@ -337,7 +344,7 @@ class GitVersionService @JvmOverloads constructor(
     /**
      * This is the calculated previous version from the Git repository.
      */
-    val previousVersion: String ?by lazy {
+    val previousVersion: String? by lazy {
         var pvstr: String? = null
         val pv = getPreviousVersionFromTags()
         if( pv != null) {
@@ -376,7 +383,35 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun getBranchNameForVersion(prefix: String, branchName: String): String {
-        return branchName.substring("${prefix}${separator}".length).replace("/", "_")
+        val bname = branchName.substring("${prefix}${separator}".length)
+        val sname = bname.split("/".toRegex(), 2)
+        val fname = if(sname.size > 1) {
+                        sname[0] + "-" + sname[1].replace("/", "_").shortened()
+                    } else {
+                        sname[0].shortened()
+                    }
+        return fname
+    }
+
+    private fun String.shortened(): String {
+        return if(shortened) {
+            val finder = "^\\d*".toRegex()
+            val founded = finder.find(this)
+            val number = if(founded != null) { founded.value } else { "" }
+
+            return if(number.isNotEmpty() && this.length > number.length) {
+                number + "_" + this.substring(number.length + 1).sha().substring(0,20)
+            } else {
+                this.sha().substring(0,20)
+            }
+        } else {
+            this
+        }
+    }
+
+    private fun String.sha(): String {
+        val sha = MessageDigest.getInstance("SHA-1")
+        return BigInteger(1, sha.digest(toByteArray())).toString(16).padStart(32, '0')
     }
 
     private fun getVersionForLocalChanges(version: String, alt: String): String {

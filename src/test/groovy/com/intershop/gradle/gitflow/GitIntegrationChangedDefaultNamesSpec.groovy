@@ -65,7 +65,7 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is bugfix-<branch name>'
-        version == "bugfix-JIRA-1-SNAPSHOT"
+        version == "JIRA-1-SNAPSHOT"
         println(" - bugfix/JIRA-1 -> bugfix-JIRA-1-SNAPSHOT")
 
         when: 'on story branch story/JIRA-2'
@@ -74,7 +74,7 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-2-SNAPSHOT"
+        version == "JIRA-2-SNAPSHOT"
         println(" - story/JIRA-2 -> story-JIRA-2-SNAPSHOT")
     }
 
@@ -106,8 +106,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-2-SNAPSHOT"
-        println(" - story/JIRA-2 -> story-JIRA-2-SNAPSHOT")
+        version == "JIRA-2-SNAPSHOT"
+        println(" - story/JIRA-2 -> JIRA-2-SNAPSHOT")
 
         when: 'on story branch story/JIRA-3'
         creator.setBranch("story/JIRA-3")
@@ -115,8 +115,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-3-SNAPSHOT"
-        println(" - story/JIRA-3 -> story-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - story/JIRA-3 -> JIRA-3-SNAPSHOT")
     }
 
     def 'test 02 - no prepared - prepared  branch with bugfix'() {
@@ -156,8 +156,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-3-SNAPSHOT"
-        println(" - story/JIRA-3 -> story-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - story/JIRA-3 -> JIRA-3-SNAPSHOT")
     }
 
     def 'test 03 - no prepared - prepared  branch merged bugfix'() {
@@ -197,8 +197,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-3-SNAPSHOT"
-        println(" - story/JIRA-3 -> story-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - story/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on bugfix branch bugfix/JIRA-4'
         creator.setBranch("bugfix/JIRA-4")
@@ -206,8 +206,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then:
-        version == "bugfix-JIRA-4-SNAPSHOT"
-        println(" - bugfix/JIRA-4 -> bugfix-JIRA-4-SNAPSHOT")
+        version == "JIRA-4-SNAPSHOT"
+        println(" - bugfix/JIRA-4 -> JIRA-4-SNAPSHOT")
     }
 
     def 'test 04 - prepared - prepared branch ready'() {
@@ -247,8 +247,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-3-SNAPSHOT"
-        println(" - story/JIRA-3 -> story-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - story/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on story branch story/JIRA-5'
         creator.setBranch("story/JIRA-5")
@@ -256,8 +256,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-5-SNAPSHOT"
-        println(" - story/JIRA-5 -> story-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - story/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 05 - prepared - prepared branch merged and taged, prepared branch still available'() {
@@ -297,8 +297,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-3-SNAPSHOT"
-        println(" - story/JIRA-3 -> story-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - story/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on story branch story/JIRA-5'
         creator.setBranch("story/JIRA-5")
@@ -306,8 +306,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-5-SNAPSHOT"
-        println(" - story/JIRA-5 -> story-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - story/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 06 - prepared and storys, prepared branch removed'() {
@@ -338,8 +338,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-3-SNAPSHOT"
-        println(" - story/JIRA-3 -> story-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - story/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on story branch story/JIRA-5'
         creator.setBranch("story/JIRA-5")
@@ -347,8 +347,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-5-SNAPSHOT"
-        println(" - story/JIRA-5 -> story-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - story/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 07 - prepared, bugfix and storys'() {
@@ -379,8 +379,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is bugfix-<branch name>'
-        version == "bugfix-JIRA-6-SNAPSHOT"
-        println(" - bugfix/JIRA-6 -> bugfix-JIRA-6-SNAPSHOT")
+        version == "JIRA-6-SNAPSHOT"
+        println(" - bugfix/JIRA-6 -> JIRA-6-SNAPSHOT")
 
         when: 'on story branch story/JIRA-3'
         creator.setBranch("story/JIRA-3")
@@ -388,8 +388,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-3-SNAPSHOT"
-        println(" - story/JIRA-3 -> story-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - story/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on story branch story/JIRA-5'
         creator.setBranch("story/JIRA-5")
@@ -397,8 +397,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-5-SNAPSHOT"
-        println(" - story/JIRA-5 -> story-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - story/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 08 - prepared, story merged'(){
@@ -438,8 +438,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is bugfix-<branch name>'
-        version == "bugfix-JIRA-6-SNAPSHOT"
-        println(" - bugfix/JIRA-6 -> bugfix-JIRA-6-SNAPSHOT")
+        version == "JIRA-6-SNAPSHOT"
+        println(" - bugfix/JIRA-6 -> JIRA-6-SNAPSHOT")
 
         when: 'on story branch story/JIRA-5'
         creator.setBranch("story/JIRA-5")
@@ -447,8 +447,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-5-SNAPSHOT"
-        println(" - story/JIRA-5 -> story-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - story/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 09 - prepareds, prepared branch and story'() {
@@ -488,8 +488,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-5-SNAPSHOT"
-        println(" - story/JIRA-5 -> story-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - story/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 10 - new prepared branch ready'() {
@@ -529,8 +529,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is story-<branch name>'
-        version == "story-JIRA-5-SNAPSHOT"
-        println(" - story/JIRA-5 -> story-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - story/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 11 - prepared branch merged'() {
@@ -666,8 +666,8 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is bugfix-<branch name>'
-        version == "bugfix-JIRA-7-SNAPSHOT"
-        println(" - bugfix/JIRA-7 -> bugfix-JIRA-7-SNAPSHOT")
+        version == "JIRA-7-SNAPSHOT"
+        println(" - bugfix/JIRA-7 -> JIRA-7-SNAPSHOT")
     }
 
     def 'test 15 - new prepared branch merged'() {
@@ -707,7 +707,7 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         version = gvs.version
 
         then: 'version is bugfix-<branch name>'
-        version == "bugfix-JIRA-7-SNAPSHOT"
+        version == "JIRA-7-SNAPSHOT"
         println(" - bugfix/JIRA-7 -> bugfix-JIRA-7-SNAPSHOT")
     }
 

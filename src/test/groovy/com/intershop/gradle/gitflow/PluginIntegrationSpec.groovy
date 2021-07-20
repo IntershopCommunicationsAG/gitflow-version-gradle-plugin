@@ -144,7 +144,131 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result2.output.contains("hotfix-team1_12345-message-SNAPSHOT")
+        result2.output.contains("team1-12345-message-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test path with team - shortend'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+                
+                shortened = true
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("team1-12345_6f9b9af3cd6e8b8a73c2-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test path with team - long descr shortend'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+                
+                shortened = true
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithLongNames(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message_ddfdffearer-erwrwear-efdgfwewrwerwe-ewwerwerwer")
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("team1-12345_9b2932ac376b2cbfa4d3-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345_message_ddfdffearer-ereterwrwear-ewewrwerwe-ewwerwerwer")
+
+        def result3 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result3.output.contains("team1-12345_68f8984c4edb8141ffb0-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions

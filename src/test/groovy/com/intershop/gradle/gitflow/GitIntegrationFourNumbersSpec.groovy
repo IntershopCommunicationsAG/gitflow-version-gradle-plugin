@@ -53,8 +53,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-1-SNAPSHOT"
-        println(" - hotfix/JIRA-1 -> hotfix-JIRA-1-SNAPSHOT")
+        version == "JIRA-1-SNAPSHOT"
+        println(" - hotfix/JIRA-1 -> JIRA-1-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-2'
         creator.setBranch("feature/JIRA-2")
@@ -62,8 +62,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-2-SNAPSHOT"
-        println(" - feature/JIRA-2 -> feature-JIRA-2-SNAPSHOT")
+        version == "JIRA-2-SNAPSHOT"
+        println(" - feature/JIRA-2 -> JIRA-2-SNAPSHOT")
     }
 
     def 'test 01 - no release - hotfix 1 merge'() {
@@ -94,8 +94,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-2-SNAPSHOT"
-        println(" - feature/JIRA-2 -> feature-JIRA-2-SNAPSHOT")
+        version == "JIRA-2-SNAPSHOT"
+        println(" - feature/JIRA-2 -> JIRA-2-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
@@ -103,8 +103,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
     }
 
     def 'test 02 - no release - release  branch with hotfix'() {
@@ -144,8 +144,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
     }
 
     def 'test 03 - no release - release  branch merged hotfix'() {
@@ -185,8 +185,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on hotfix branch hotfix/JIRA-4'
         creator.setBranch("hotfix/JIRA-4")
@@ -194,8 +194,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then:
-        version == "hotfix-JIRA-4-SNAPSHOT"
-        println(" - hotfix/JIRA-4 -> hotfix-JIRA-4-SNAPSHOT")
+        version == "JIRA-4-SNAPSHOT"
+        println(" - hotfix/JIRA-4 -> JIRA-4-SNAPSHOT")
     }
 
     def 'test 04 - release - release branch ready'() {
@@ -235,8 +235,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
@@ -244,8 +244,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 05 - release - release branch merged and taged, release branch still available'() {
@@ -285,8 +285,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
@@ -294,8 +294,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 06 - release and features, release branch removed'() {
@@ -326,8 +326,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
@@ -335,8 +335,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 07 - release, hotfix and features'() {
@@ -367,8 +367,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-6-SNAPSHOT"
-        println(" - hotfix/JIRA-6 -> hotfix-JIRA-6-SNAPSHOT")
+        version == "JIRA-6-SNAPSHOT"
+        println(" - hotfix/JIRA-6 -> JIRA-6-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
@@ -376,8 +376,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
@@ -385,8 +385,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 08 - release, feature merged'(){
@@ -426,8 +426,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-6-SNAPSHOT"
-        println(" - hotfix/JIRA-6 -> hotfix-JIRA-6-SNAPSHOT")
+        version == "JIRA-6-SNAPSHOT"
+        println(" - hotfix/JIRA-6 -> JIRA-6-SNAPSHOT")
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
@@ -435,8 +435,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 09 - releases, release branch and feature'() {
@@ -476,8 +476,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 10 - new release branch ready'() {
@@ -517,8 +517,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
     def 'test 11 - release branch merged'() {
@@ -654,8 +654,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-7-SNAPSHOT"
-        println(" - hotfix/JIRA-7 -> hotfix-JIRA-7-SNAPSHOT")
+        version == "JIRA-7-SNAPSHOT"
+        println(" - hotfix/JIRA-7 -> JIRA-7-SNAPSHOT")
     }
 
     def 'test 15 - new release branch merged'() {
@@ -695,8 +695,8 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-7-SNAPSHOT"
-        println(" - hotfix/JIRA-7 -> hotfix-JIRA-7-SNAPSHOT")
+        version == "JIRA-7-SNAPSHOT"
+        println(" - hotfix/JIRA-7 -> JIRA-7-SNAPSHOT")
     }
 
     def 'test 16 - old release taged'() {

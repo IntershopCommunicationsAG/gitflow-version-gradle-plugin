@@ -64,8 +64,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-1-SNAPSHOT"
-        println(" - hotfix/JIRA-1 -> hotfix-JIRA-1-SNAPSHOT")
+        version == "JIRA-1-SNAPSHOT"
+        println(" - hotfix/JIRA-1 -> JIRA-1-SNAPSHOT")
         preVersion == null
         println(' - hotfix -> pre version is null')
 
@@ -76,8 +76,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-2-SNAPSHOT"
-        println(" - feature/JIRA-2 -> feature-JIRA-2-SNAPSHOT")
+        version == "JIRA-2-SNAPSHOT"
+        println(" - feature/JIRA-2 -> JIRA-2-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -117,8 +117,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-2-SNAPSHOT"
-        println(" - feature/JIRA-2 -> feature-JIRA-2-SNAPSHOT")
+        version == "JIRA-2-SNAPSHOT"
+        println(" - feature/JIRA-2 -> JIRA-2-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
 
@@ -129,8 +129,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -182,8 +182,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -235,8 +235,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
 
@@ -247,8 +247,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then:
-        version == "hotfix-JIRA-4-SNAPSHOT"
-        println(" - hotfix/JIRA-4 -> hotfix-JIRA-4-SNAPSHOT")
+        version == "JIRA-4-SNAPSHOT"
+        println(" - hotfix/JIRA-4 -> JIRA-4-SNAPSHOT")
         preVersion == null
         println(' - hotfix -> pre version is null')
     }
@@ -300,8 +300,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
 
@@ -312,8 +312,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -365,8 +365,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
 
@@ -377,8 +377,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -418,8 +418,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
 
@@ -430,8 +430,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -471,8 +471,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-6-SNAPSHOT"
-        println(" - hotfix/JIRA-6 -> hotfix-JIRA-6-SNAPSHOT")
+        version == "JIRA-6-SNAPSHOT"
+        println(" - hotfix/JIRA-6 -> JIRA-6-SNAPSHOT")
         preVersion == null
         println(' - hotfix -> pre version is null')
 
@@ -483,8 +483,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-3-SNAPSHOT"
-        println(" - feature/JIRA-3 -> feature-JIRA-3-SNAPSHOT")
+        version == "JIRA-3-SNAPSHOT"
+        println(" - feature/JIRA-3 -> JIRA-3-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
 
@@ -495,8 +495,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -548,8 +548,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-6-SNAPSHOT"
-        println(" - hotfix/JIRA-6 -> hotfix-JIRA-6-SNAPSHOT")
+        version == "JIRA-6-SNAPSHOT"
+        println(" - hotfix/JIRA-6 -> JIRA-6-SNAPSHOT")
         preVersion == null
         println(' - hotfix -> pre version is null')
 
@@ -560,8 +560,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -613,8 +613,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -666,8 +666,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is feature-<branch name>'
-        version == "feature-JIRA-5-SNAPSHOT"
-        println(" - feature/JIRA-5 -> feature-JIRA-5-SNAPSHOT")
+        version == "JIRA-5-SNAPSHOT"
+        println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
         preVersion == null
         println(' - feature -> pre version is null')
     }
@@ -840,8 +840,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-7-SNAPSHOT"
-        println(" - hotfix/JIRA-7 -> hotfix-JIRA-7-SNAPSHOT")
+        version == "JIRA-7-SNAPSHOT"
+        println(" - hotfix/JIRA-7 -> JIRA-7-SNAPSHOT")
         preVersion == null
         println(' - hotfix -> pre version is null')
     }
@@ -893,8 +893,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion = gvs.previousVersion
 
         then: 'version is hotfix-<branch name>'
-        version == "hotfix-JIRA-7-SNAPSHOT"
-        println(" - hotfix/JIRA-7 -> hotfix-JIRA-7-SNAPSHOT")
+        version == "JIRA-7-SNAPSHOT"
+        println(" - hotfix/JIRA-7 -> JIRA-7-SNAPSHOT")
         preVersion == null
         println(' - hotfix -> pre version is null')
     }

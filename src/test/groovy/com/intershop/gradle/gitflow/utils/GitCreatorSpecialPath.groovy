@@ -38,4 +38,30 @@ class GitCreatorSpecialPath {
 
         return creator
     }
+
+    static TestRepoCreator initGitRepoWithLongNames(File dir, String buildFileContent)  {
+        TestRepoCreator creator = new TestRepoCreator(dir)
+        if(! buildFileContent.isEmpty()) {
+            //add build files
+            creator.addBuildGroovyFile(buildFileContent)
+        }
+
+        def cMaster = creator.createCommits("master", 2)
+        creator.createBranch("develop", cMaster)
+        def cDevelop = creator.createCommits("develop", 2)
+
+        creator.setBranch("master")
+        creator.createBranch("hotfix/team1/12345-message_ddfdffearer-erwrwear-efdgfwewrwerwe-ewwerwerwer", cMaster)
+        creator.createCommits("#12345: message", 2)
+
+        creator.setBranch("master")
+        creator.createBranch("hotfix/team1/12345_message_ddfdffearer-ereterwrwear-ewewrwerwe-ewwerwerwer", cMaster)
+        creator.createCommits("#23456: message", 2)
+
+        creator.setBranch("develop")
+        creator.createBranch("feature/team2/34567-message", cDevelop)
+        creator.createCommits("#34567: message", 3)
+
+        return creator
+    }
 }

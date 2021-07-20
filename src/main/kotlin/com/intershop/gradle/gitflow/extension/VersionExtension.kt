@@ -49,6 +49,12 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     private val versionPrefixProperty = objectFactory.property(String::class.java)
     private val separatorProperty = objectFactory.property(String::class.java)
     private val versionTypeProperty = objectFactory.property(String::class.java)
+    private val shortenedProperty = objectFactory.property(Boolean::class.java)
+
+    private val versionProperty = objectFactory.property(String::class.java)
+    private val branchProperty = objectFactory.property(String::class.java)
+    private val previousVersionProperty = objectFactory.property(String::class.java)
+    private val containerVersionProperty = objectFactory.property(String::class.java)
 
     init {
         defaultVersionProperty.convention("1.0.0")
@@ -60,6 +66,12 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionPrefixProperty.convention("version")
         separatorProperty.convention("/")
         versionTypeProperty.convention("three")
+        shortenedProperty.convention(false)
+
+        versionProperty.convention("")
+        previousVersionProperty.convention("")
+        containerVersionProperty.convention("")
+        branchProperty.convention("")
     }
 
     /**
@@ -180,6 +192,19 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         set(value) = versionTypeProperty.set(value)
 
     /**
+     * This is provider for the shortened property.
+     */
+    val shortenedProvider: Provider<Boolean>
+        get() = shortenedProperty
+
+    /**
+     * This is shortened property.
+     */
+    var shortened : Boolean
+        get() = shortenedProperty.get()
+        set(value) = shortenedProperty.set(value)
+
+    /**
      * This is the service for version calculation.
      */
     val versionService: GitVersionService by lazy {
@@ -198,6 +223,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionService.releasePrefix = releasePrefixProperty.get()
         versionService.versionPrefix = versionPrefixProperty.get()
         versionService.separator = separatorProperty.get()
+        versionService.shortened = shortenedProperty.get()
 
         val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion").
                                                              forUseAtConfigurationTime()
@@ -215,7 +241,10 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
      * This is the version string.
      */
     val version: String by lazy {
-        this.versionService.version
+        if(versionProperty.get().isEmpty()) {
+            versionProperty.set(this.versionService.version)
+        }
+        versionProperty.get()
     }
 
     /**
@@ -223,20 +252,29 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
      * There is no "Snapshot"
      */
     val containerVersion: String by lazy {
-        this.versionService.containerVersion
+        if(containerVersionProperty.get().isEmpty()) {
+            containerVersionProperty.set(this.versionService.containerVersion)
+        }
+        containerVersionProperty.get()
     }
 
     /**
      * This is the previous version string.
      */
     val previousVersion: String by lazy {
-        this.versionService.previousVersion ?: ""
+        if(previousVersionProperty.get().isEmpty()) {
+            previousVersionProperty.set(this.versionService.previousVersion ?: "")
+        }
+        previousVersionProperty.get()
     }
 
     /**
      * This is the branch name.
      */
     val branchName: String by lazy {
-        this.versionService.branch
+        if(branchProperty.get().isEmpty()) {
+            branchProperty.set(this.versionService.branch)
+        }
+        branchProperty.get()
     }
 }

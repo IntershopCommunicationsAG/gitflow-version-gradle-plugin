@@ -36,6 +36,7 @@ version to "local".
 |*version*          | String | (read only)   | This is the calculated version.
 |*previousVersion*  | String | (read only)   | This is the calculated previous version on the branch.
 |*branchName*       | String | (read only)   | This is the current branch name.
+|*shortened*        | Boolean | false        | If this is true, the branch name is shortened and replaced by an hash.
 |===
 
 If the Gradle property "localVersion" is true, the version is always "local".
@@ -60,6 +61,8 @@ gitflowVersion {
     hotfixPrefix = "hotfix"
     featurePrefix = "feature"
     releasePrefix = "release"
+
+    shortened = false
 }
 
 version = gitflowVersion.version
@@ -88,6 +91,8 @@ gitflowVersion {
     hotfixPrefix = "hotfix"
     featurePrefix = "feature"
     releasePrefix = "release"
+
+    shortened = false
 }
 
 version = gitflowVersion.version
@@ -105,7 +110,7 @@ The version is always 'dev-SNAPSHOT'. No other version information is possible o
 
 * Feature / Hotfix Branch (feature / hotfix)
 The version is always the branch name (words connected with hyphens) and extended with SNAPSHOT.
-Example: branch name is feature/branch-name -> 'branch-name-SNAPSHOT'
+Example: branch is feature/branch-name -> 'branch-name-SNAPSHOT'
 
 * Release branches (release)
 The version is calculated from the branch name and extended with SNAPSHOT.
