@@ -34,6 +34,7 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         gvs.featurePrefix = "story"
         gvs.hotfixPrefix = "bugfix"
         gvs.releasePrefix = "prepared"
+        gvs.fullbranch = true
         return gvs
     }
 
@@ -85,6 +86,7 @@ class GitIntegrationChangedDefaultNamesSpec extends AbstractIntegrationGroovySpe
         when: 'on trunk'
         creator.setBranch("trunk")
         GitVersionService gvs = getConfGitVersionService(creator.directory)
+        gvs.fullbranch = true
         String version = gvs.version
 
         then: 'Version is 2.0.0-SNAPSHOT (default version)'

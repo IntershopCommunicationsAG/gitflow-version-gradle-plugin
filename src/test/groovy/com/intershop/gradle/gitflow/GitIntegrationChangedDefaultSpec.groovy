@@ -30,6 +30,7 @@ class GitIntegrationChangedDefaultSpec extends AbstractIntegrationGroovySpec {
     def getConfGitVersionService(File dir) {
         GitVersionService gvs = new GitVersionService(dir, VersionType.threeDigits)
         gvs.defaultVersion = Version.forString("2.0.0", VersionType.threeDigits)
+        gvs.fullbranch = true
         return gvs
     }
 

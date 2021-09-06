@@ -27,6 +27,8 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
 
     def getConfGitVersionService(File dir) {
         GitVersionService gvs = new GitVersionService(dir, VersionType.threeDigits)
+        gvs.fullbranch = true
+        return gvs
     }
 
     def 'test init - no releases available'() {

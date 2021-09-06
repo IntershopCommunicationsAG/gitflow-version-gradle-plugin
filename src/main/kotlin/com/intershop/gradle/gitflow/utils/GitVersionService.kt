@@ -125,7 +125,7 @@ class GitVersionService @JvmOverloads constructor(
      * Version is shortened for branches and hotfixes
      * with an hash for the string if shortened is true.
      */
-    var shortened: Boolean = false
+    var fullbranch: Boolean = false
 
     /**
      * Default version.
@@ -386,7 +386,7 @@ class GitVersionService @JvmOverloads constructor(
         val bname = branchName.substring("${prefix}${separator}".length)
         val sname = bname.split("/".toRegex(), 2)
         val fname = if(sname.size > 1) {
-                        sname[0] + "-" + sname[1].replace("/", "_").shortened()
+                        sname[1].replace("/", "_").shortened()
                     } else {
                         sname[0].shortened()
                     }
@@ -394,15 +394,16 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun String.shortened(): String {
-        return if(shortened) {
+        return if(! fullbranch) {
             val finder = "^\\d*".toRegex()
             val founded = finder.find(this)
             val number = if(founded != null) { founded.value } else { "" }
 
             return if(number.isNotEmpty() && this.length > number.length) {
-                number + "_" + this.substring(number.length + 1).sha().substring(0,20)
+                number + "." + this.substring(number.length + 1).sha().
+                                replace("[a-z]".toRegex(), "").substring(0,20)
             } else {
-                this.sha().substring(0,20)
+                this.sha().replace("[a-z]".toRegex(), "").substring(0,20)
             }
         } else {
             this

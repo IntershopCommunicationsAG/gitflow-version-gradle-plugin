@@ -24,6 +24,11 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
+    def getConfGitVersionService(File dir) {
+        GitVersionService gvs = new GitVersionService(dir)
+        gvs.fullbranch = true
+        return gvs
+    }
 
     def 'test init - no releases available'() {
         given:
@@ -31,7 +36,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
@@ -40,7 +45,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -49,7 +54,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on hotfix branch hotfix/JIRA-1'
         creator.setBranch("hotfix/JIRA-1")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
@@ -58,7 +63,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-2'
         creator.setBranch("feature/JIRA-2")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -72,7 +77,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
@@ -81,7 +86,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -90,7 +95,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-2'
         creator.setBranch("feature/JIRA-2")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -99,7 +104,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -113,7 +118,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
@@ -122,7 +127,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -131,7 +136,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is 7.11.0.0-SNAPSHOT'
@@ -140,7 +145,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -154,7 +159,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
@@ -163,7 +168,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -172,7 +177,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is 7.11.0.0-SNAPSHOT'
@@ -181,7 +186,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -190,7 +195,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on hotfix branch hotfix/JIRA-4'
         creator.setBranch("hotfix/JIRA-4")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then:
@@ -204,7 +209,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 1.0.0.0-SNAPSHOT (default version)'
@@ -213,7 +218,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -222,7 +227,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is 7.11.0.0-SNAPSHOT'
@@ -231,7 +236,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -240,7 +245,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -254,7 +259,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.0.0'
@@ -263,7 +268,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -272,7 +277,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release branch release/7.11.0'
         creator.setBranch("release/7.11.0")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is 7.11.0.0-SNAPSHOT'
@@ -281,7 +286,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -290,7 +295,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -304,7 +309,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.0.0'
@@ -313,7 +318,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -322,7 +327,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -331,7 +336,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -345,7 +350,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.0.0'
@@ -354,7 +359,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -363,7 +368,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch hotfix/JIRA-6'
         creator.setBranch("hotfix/JIRA-6")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
@@ -372,7 +377,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-3'
         creator.setBranch("feature/JIRA-3")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -381,7 +386,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -395,7 +400,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.0.0'
@@ -404,7 +409,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -413,7 +418,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release branch release/7.11.1'
         creator.setBranch("release/7.11.1")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is 7.11.1.0-SNAPSHOT'
@@ -422,7 +427,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch hotfix/JIRA-6'
         creator.setBranch("hotfix/JIRA-6")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
@@ -431,7 +436,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -445,7 +450,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.0.1'
@@ -454,7 +459,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -463,7 +468,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release branch release/7.11.1'
         creator.setBranch("release/7.11.1")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is 7.11.1.0-SNAPSHOT'
@@ -472,7 +477,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -486,7 +491,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.0.1'
@@ -495,7 +500,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -504,7 +509,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release branch release/7.11.1'
         creator.setBranch("release/7.11.1")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is 7.11.1.0-SNAPSHOT'
@@ -513,7 +518,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch feature/JIRA-5'
         creator.setBranch("feature/JIRA-5")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is feature-<branch name>'
@@ -527,7 +532,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.1.0-SNAPSHOT'
@@ -536,7 +541,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -550,7 +555,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.1.0'
@@ -559,7 +564,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -573,7 +578,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.1.0'
@@ -582,7 +587,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -591,7 +596,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.11'
         creator.setBranch("release/7.11")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.11.1.0'
@@ -600,7 +605,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.12'
         creator.setBranch("release/7.12.0")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.12.0.0-SNAPSHOT'
@@ -614,7 +619,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.11.1.0'
@@ -623,7 +628,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -632,7 +637,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.11'
         creator.setBranch("release/7.11")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.11.1.1-SNAPSHOT'
@@ -641,7 +646,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.12'
         creator.setBranch("release/7.12.0")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.12.0.0-SNAPSHOT'
@@ -650,7 +655,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch hotfix/JIRA-7'
         creator.setBranch("hotfix/JIRA-7")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
@@ -664,7 +669,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.12.0.0'
@@ -673,7 +678,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -682,7 +687,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.11'
         creator.setBranch("release/7.11")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.11.1.1-SNAPSHOT'
@@ -691,7 +696,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on feature branch hotfix/JIRA-7'
         creator.setBranch("hotfix/JIRA-7")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is hotfix-<branch name>'
@@ -705,7 +710,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.12.0.0'
@@ -714,7 +719,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -723,7 +728,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.11'
         creator.setBranch("release/7.11")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.11.1.1-SNAPSHOT'
@@ -737,7 +742,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then: 'Version is 7.12.0.1-SNAPSHOT'
@@ -746,7 +751,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -755,7 +760,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.11'
         creator.setBranch("release/7.11")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.11.1.1'
@@ -769,7 +774,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on master'
         creator.setBranch("master")
-        GitVersionService gvs = new GitVersionService(creator.directory)
+        GitVersionService gvs = getConfGitVersionService(creator.directory)
         String version = gvs.version
 
         then:
@@ -777,7 +782,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on develop branch'
         creator.setBranch("develop")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'version is dev-SNAPSHOT'
@@ -786,7 +791,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
 
         when: 'on release/7.11'
         creator.setBranch("release/7.11")
-        gvs = new GitVersionService(creator.directory)
+        gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
 
         then: 'Version is 7.11.1.2-SNAPSHOT'

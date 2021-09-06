@@ -144,7 +144,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result2.output.contains("team1-12345-message-SNAPSHOT")
+        result2.output.contains("12345.69936887323795922627-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions
@@ -167,7 +167,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 featurePrefix = "features"
                 releasePrefix = "release"
                 
-                shortened = true
+                fullbranch = true
             }
             
             version = gitflowVersion.version
@@ -200,7 +200,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result2.output.contains("team1-12345_6f9b9af3cd6e8b8a73c2-SNAPSHOT")
+        result2.output.contains("12345-message-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions
@@ -222,12 +222,9 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 hotfixPrefix = "hotfix"
                 featurePrefix = "features"
                 releasePrefix = "release"
-                
-                shortened = true
             }
             
             version = gitflowVersion.version
-            
             
         """.stripIndent()
 
@@ -256,7 +253,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result2.output.contains("team1-12345_9b2932ac376b2cbfa4d3-SNAPSHOT")
+        result2.output.contains("12345.92932376243859331116-SNAPSHOT")
 
         when:
         creator.setBranch("hotfix/team1/12345_message_ddfdffearer-ereterwrwear-ewewrwerwe-ewwerwerwer")
@@ -268,7 +265,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result3.output.contains("team1-12345_68f8984c4edb8141ffb0-SNAPSHOT")
+        result3.output.contains("12345.68898448141089054850-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions

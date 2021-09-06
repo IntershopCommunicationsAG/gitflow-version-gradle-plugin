@@ -49,7 +49,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     private val versionPrefixProperty = objectFactory.property(String::class.java)
     private val separatorProperty = objectFactory.property(String::class.java)
     private val versionTypeProperty = objectFactory.property(String::class.java)
-    private val shortenedProperty = objectFactory.property(Boolean::class.java)
+    private val fullbranchProperty = objectFactory.property(Boolean::class.java)
 
     private val versionProperty = objectFactory.property(String::class.java)
     private val branchProperty = objectFactory.property(String::class.java)
@@ -66,7 +66,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionPrefixProperty.convention("version")
         separatorProperty.convention("/")
         versionTypeProperty.convention("three")
-        shortenedProperty.convention(false)
+        fullbranchProperty.convention(false)
 
         versionProperty.convention("")
         previousVersionProperty.convention("")
@@ -195,14 +195,14 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
      * This is provider for the shortened property.
      */
     val shortenedProvider: Provider<Boolean>
-        get() = shortenedProperty
+        get() = fullbranchProperty
 
     /**
      * This is shortened property.
      */
-    var shortened : Boolean
-        get() = shortenedProperty.get()
-        set(value) = shortenedProperty.set(value)
+    var fullbranch : Boolean
+        get() = fullbranchProperty.get()
+        set(value) = fullbranchProperty.set(value)
 
     /**
      * This is the service for version calculation.
@@ -223,7 +223,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionService.releasePrefix = releasePrefixProperty.get()
         versionService.versionPrefix = versionPrefixProperty.get()
         versionService.separator = separatorProperty.get()
-        versionService.shortened = shortenedProperty.get()
+        versionService.fullbranch = fullbranchProperty.get()
 
         val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion").
                                                              forUseAtConfigurationTime()

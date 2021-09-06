@@ -3,7 +3,7 @@
 :toc:
 :icons: font
 
-NOTE: This plugins requires Gradle 6.
+NOTE: This plugins requires Gradle 6 and later.
 
 == Summary
 This plugin calculates the version from the Git repository. The plugin assumes that the used workflow follows the GitFlow principle. See https://infos.seibert-media.net/display/Productivity/Git-Workflows+-+Der+Gitflow-Workflow (DE) or https://datasift.github.io/gitflow/IntroducingGitFlow.html (EN).
@@ -36,7 +36,7 @@ version to "local".
 |*version*          | String | (read only)   | This is the calculated version.
 |*previousVersion*  | String | (read only)   | This is the calculated previous version on the branch.
 |*branchName*       | String | (read only)   | This is the current branch name.
-|*shortened*        | Boolean | false        | If this is true, the branch name is shortened and replaced by an hash.
+|*fullbranch*        | Boolean | false        | If this is true, the branch name is used as a part of the version.
 |===
 
 If the Gradle property "localVersion" is true, the version is always "local".
@@ -61,8 +61,6 @@ gitflowVersion {
     hotfixPrefix = "hotfix"
     featurePrefix = "feature"
     releasePrefix = "release"
-
-    shortened = false
 }
 
 version = gitflowVersion.version
@@ -91,8 +89,6 @@ gitflowVersion {
     hotfixPrefix = "hotfix"
     featurePrefix = "feature"
     releasePrefix = "release"
-
-    shortened = false
 }
 
 version = gitflowVersion.version
@@ -109,8 +105,8 @@ The plugin is looking for a tag on the branch with the version prefix. If there 
 The version is always 'dev-SNAPSHOT'. No other version information is possible on the branch.
 
 * Feature / Hotfix Branch (feature / hotfix)
-The version is always the branch name (words connected with hyphens) and extended with SNAPSHOT.
-Example: branch is feature/branch-name -> 'branch-name-SNAPSHOT'
+The version is always the ticket number - if available - and the branchname is a hash without letters extended with SNAPSHOT.
+Example: branch is feature/1234_branch-name -> '1234.34354645645554455344-SNAPSHOT'
 
 * Release branches (release)
 The version is calculated from the branch name and extended with SNAPSHOT.
