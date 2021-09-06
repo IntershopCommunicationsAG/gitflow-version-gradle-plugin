@@ -36,7 +36,7 @@ plugins {
     signing
 
     // plugin for documentation
-    id("org.asciidoctor.jvm.convert") version "3.3.0"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
 
     // documentation
     id("org.jetbrains.dokka") version "1.4.32"
