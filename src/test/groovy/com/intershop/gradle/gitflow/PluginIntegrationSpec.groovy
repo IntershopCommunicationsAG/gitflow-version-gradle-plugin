@@ -144,7 +144,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result2.output.contains("12345.69936887323795922627-SNAPSHOT")
+        result2.output.contains("12345.6993688732-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions
@@ -253,7 +253,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result2.output.contains("12345.92932376243859331116-SNAPSHOT")
+        result2.output.contains("12345.9293237624-SNAPSHOT")
 
         when:
         creator.setBranch("hotfix/team1/12345_message_ddfdffearer-ereterwrwear-ewewrwerwe-ewwerwerwer")
@@ -265,7 +265,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result3.output.contains("12345.68898448141089054850-SNAPSHOT")
+        result3.output.contains("12345.6889844814-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions
