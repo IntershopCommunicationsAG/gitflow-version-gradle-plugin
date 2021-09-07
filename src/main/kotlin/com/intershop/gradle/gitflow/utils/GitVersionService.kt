@@ -395,15 +395,15 @@ class GitVersionService @JvmOverloads constructor(
 
     private fun String.shortened(): String {
         return if(! fullbranch) {
-            val finder = "^\\d*".toRegex()
+            val finder = "^#?\\d+".toRegex()
             val founded = finder.find(this)
-            val number = if(founded != null) { founded.value } else { "" }
+            val number = if(founded != null) { founded.value.replace("#", "") } else { "" }
 
             return if(number.isNotEmpty() && this.length > number.length) {
                 number + "." + this.substring(number.length + 1).sha().
-                                replace("[a-z]".toRegex(), "").substring(0,20)
+                                replace("[a-z]".toRegex(), "").substring(0,10)
             } else {
-                this.sha().replace("[a-z]".toRegex(), "").substring(0,20)
+                this.sha().replace("[a-z]".toRegex(), "").substring(0,10)
             }
         } else {
             this
