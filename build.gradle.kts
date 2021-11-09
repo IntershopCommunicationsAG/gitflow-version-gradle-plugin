@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -83,11 +82,6 @@ pluginBundle {
     tags = listOf("intershop", "gradle", "plugin", "version", "release")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 // set correct project status
 if (project.version.toString().endsWith("-SNAPSHOT")) {
     status = "snapshot'"
@@ -102,7 +96,7 @@ tasks {
     withType<Test>().configureEach {
         maxParallelForks = 1
 
-        systemProperty("intershop.gradle.versions", "7.1")
+        systemProperty("intershop.gradle.versions", "7.2")
         useJUnitPlatform()
     }
 
@@ -153,10 +147,10 @@ tasks {
 
     withType<JacocoReport> {
         reports {
-            xml.isEnabled = true
-            html.isEnabled = true
+            xml.required.set(true)
+            html.required.set(true)
 
-            html.destination = File(project.buildDir, "jacocoHtml")
+            html.outputLocation.set(File(project.buildDir, "jacocoHtml"))
         }
 
         val jacocoTestReport by tasks
@@ -256,7 +250,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     //jgit
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r") {
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r") {
         exclude(group = "org.apache.httpcomponents", module = "httpclient")
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
@@ -264,9 +258,10 @@ dependencies {
     testRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.6")
     testRuntimeOnly("org.slf4j:slf4j-api:1.7.25")
 
+    testImplementation("com.github.stefanbirkner:system-rules:1.19.0" )
+
     testImplementation("com.intershop.gradle.test:test-gradle-plugin:4.1.1")
     testImplementation(gradleTestKit())
 
     testImplementation("commons-io:commons-io:2.2")
 }
-

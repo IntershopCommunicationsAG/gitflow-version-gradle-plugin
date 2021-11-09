@@ -19,6 +19,13 @@ With the task `showVersion` it is possible to check the current version. Please 
 It is possible to configure the separator, prefixes and branch names and type of version. With one Gradle property it is possible to change the
 version to "local".
 
+=== Gradle Properties
+[cols="20%,15%,15%,50%", width="95%", options="header"]
+|===
+|Property           | Type   | Default value | Description
+|localVersion       | String | ""            | If this value is 'true', the version is always "LOCAL". This can be used for local development and configured in the user gradle.properties file.
+|===
+
 === Properties
 [cols="20%,15%,15%,50%", width="95%", options="header"]
 |===
@@ -38,8 +45,6 @@ version to "local".
 |*branchName*       | String | (read only)   | This is the current branch name.
 |*fullbranch*        | Boolean | false        | If this is true, the branch name is used as a part of the version.
 |===
-
-If the Gradle property "localVersion" is true, the version is always "local".
 
 ++++
 <details open>

@@ -22,6 +22,7 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -55,6 +56,11 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     private val branchProperty = objectFactory.property(String::class.java)
     private val previousVersionProperty = objectFactory.property(String::class.java)
     private val containerVersionProperty = objectFactory.property(String::class.java)
+
+    private val isMergeBranchProperty = objectFactory.property(Boolean::class.java)
+    private val sourceBranchProperty = objectFactory.property(String::class.java)
+    private val pullRequestIDProperty = objectFactory.property(String::class.java)
+    private val buildIDProperty = objectFactory.property(String::class.java)
 
     init {
         defaultVersionProperty.convention("1.0.0")
@@ -205,10 +211,17 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         set(value) = fullbranchProperty.set(value)
 
     /**
+     * Pull request ID of pull request
+     */
+    val pullRequestID : String
+        get() = pullRequestIDProperty.getOrElse("")
+
+    /**
      * This is the service for version calculation.
      */
     val versionService: GitVersionService by lazy {
-        val vType = if(versionType.toLowerCase() == "four" || versionType == "4") {
+
+        val vType = if(versionType.lowercase(Locale.getDefault()) == "four" || versionType == "4") {
                         VersionType.fourDigits
                     } else {
                         VersionType.threeDigits
@@ -227,12 +240,18 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
 
         val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion").
                                                              forUseAtConfigurationTime()
+        val mergeBuild = providerFactory.systemProperty("MERGE_BUILD").
+                                                             forUseAtConfigurationTime()
 
-        if(localVersion.isPresent) {
-            versionService.localOnly = localVersion.get().toLowerCase() == "true"
-        } else {
-            versionService.localOnly = false
-        }
+        versionService.localOnly = localVersion.getOrElse("false").lowercase(Locale.getDefault()) == "true"
+        versionService.isMergeBuild = mergeBuild.getOrElse("false").lowercase(Locale.getDefault()) == "true"
+
+        versionService.sourceBranch = providerFactory.systemProperty("PR_SOURCE_BRANCH").
+                                                             forUseAtConfigurationTime().getOrElse("")
+        versionService.pullRequestID = providerFactory.systemProperty("PR_REQUEST_ID").
+                                                             forUseAtConfigurationTime().getOrElse("")
+        versionService.buildID = providerFactory.systemProperty("PR_BUILD_ID").
+                                                             forUseAtConfigurationTime().getOrElse("")
 
         versionService
     }

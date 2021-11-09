@@ -21,6 +21,7 @@ import com.intershop.gradle.gitflow.utils.GitCreatorThreeNumbers
 import com.intershop.gradle.gitflow.utils.TestRepoCreator
 import com.intershop.gradle.test.AbstractIntegrationGroovySpec
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.Rule
 
 class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
@@ -358,9 +359,70 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 .build()
 
         then:
-        result1.output.contains("local")
+        result1.output.contains("LOCAL")
         result1.output.contains("GitFlow previous version is not available!")
         result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test plugin version for merge request'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+        File gradleproperties = new File(testProjectDir, "gradle.properties")
+        gradleproperties << """
+            systemProp.MERGE_BUILD = true
+            systemProp.PR_SOURCE_BRANCH = refs/heads/features/team2/45678-merge_message
+            systemProp.PR_REQUEST_ID = 409
+            systemProp.PR_BUILD_ID = 12345
+        """.stripIndent()
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("45678.5956694976-pr409-12345-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions

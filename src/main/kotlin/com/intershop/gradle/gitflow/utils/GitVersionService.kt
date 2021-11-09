@@ -26,12 +26,14 @@ import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevObject
 import org.eclipse.jgit.revwalk.RevWalk
+import org.gradle.api.GradleException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.*
 import java.util.stream.Collectors
 
 /**
@@ -51,6 +53,8 @@ class GitVersionService @JvmOverloads constructor(
     companion object {
         @JvmStatic
         private val log: Logger = LoggerFactory.getLogger(this::class.java.name)
+
+        const val headsPrefix = "refs/heads/"
     }
 
     /**
@@ -133,6 +137,30 @@ class GitVersionService @JvmOverloads constructor(
      */
     var defaultVersion: Version = Version.Builder(versionType).build()
 
+    /**
+     * Source Branch Name
+     * Default value is an empty string.
+     */
+    var sourceBranch: String = ""
+
+    /**
+     * Pull Request ID
+     * Default value is an empty string. Used to identify a merge build
+     */
+    var pullRequestID: String = ""
+
+    /**
+     * Build ID for Pull Requests
+     * Default value is an empty string. Used to identify a merge build
+     */
+    var buildID: String = ""
+
+    /**
+     * This must be set to true, if the version should be calculated for a pull request.
+     * Therefore the following environment variables must be set: sourceBranch, pullRequestID, buildID
+     */
+    var isMergeBuild: Boolean = false
+
     private val changed: Boolean by lazy {
         val status = client.status().call()
         val rv = status.untracked.size > 0 || status.uncommittedChanges.size > 0 ||
@@ -167,7 +195,7 @@ class GitVersionService @JvmOverloads constructor(
 
     private fun versionFromMainBranch(isContainer: Boolean) : String {
         val vm = getLatestVersion()
-        val addMetaData = getVersionForLocalChanges("", "local")
+        val addMetaData = versionForLocalChanges("", "local")
 
         return when {
             vm == defaultVersion && addMetaData.isEmpty() && !isContainer -> vm.setBuildMetadata("SNAPSHOT").toString()
@@ -180,26 +208,65 @@ class GitVersionService @JvmOverloads constructor(
         }
     }
 
-    private fun versionFromDevBranch(isContainer: Boolean) : String {
-        return if(isContainer) {
-            getVersionForLocalChanges("dev", "local-dev")
+    private fun versionForMergeBranch(isContainer: Boolean): String {
+        if (sourceBranch.isEmpty() && pullRequestID.isEmpty()) {
+            log.error("The source branch or the pull request ID is not specified," +
+                       "but necessary because this should be a version for a pull request.")
+            throw GradleException("Missing environment variables for pull request - source branch and ID")
+        }
+        if (buildID.isEmpty()) {
+            log.warn("The build ID is not specified for the version calculation for a pull request")
+        }
+        var mBranchName = if (sourceBranch.startsWith(headsPrefix)) {
+            sourceBranch.substring(headsPrefix.length)
         } else {
-            "${getVersionForLocalChanges("dev", "local-dev")}-SNAPSHOT"
+            sourceBranch
         }
 
+        var bBranchName = when {
+            mBranchName.startsWith(featurePrefix) -> {
+                getBranchNameForVersion(featurePrefix, mBranchName)
+            }
+            mBranchName.startsWith(hotfixPrefix) -> {
+                getBranchNameForVersion(hotfixPrefix, mBranchName)
+            }
+            mBranchName.startsWith(releasePrefix) -> {
+                getBranchNameForVersion(releasePrefix, mBranchName)
+            }
+            mBranchName.startsWith(developBranch) -> {
+                developBranch
+            }
+            else -> {
+                "mergeversion"
+            }
+        }
+
+        return if(isContainer) {
+                    "${bBranchName}-pr${pullRequestID}-${buildID}-latest"
+                } else {
+                    "${bBranchName}-pr${pullRequestID}-${buildID}-SNAPSHOT"
+                }
+    }
+
+    private fun versionFromDevBranch(isContainer: Boolean) : String {
+        return if(isContainer) {
+            "${versionForLocalChanges("dev", "local-dev")}-latest"
+        } else {
+            "${versionForLocalChanges("dev", "local-dev")}-SNAPSHOT"
+        }
     }
 
     private fun versionFromHotfix(isContainer: Boolean) : String {
-        val v = "${ getVersionForLocalChanges( "", "local-" 
+        val v = "${ versionForLocalChanges( "", "local-" 
                             )}${getBranchNameForVersion(hotfixPrefix, branch)}"
-        return if(isContainer) { v } else { "${ v }-SNAPSHOT" }
+        return if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
     }
 
     private fun versionFromFeature(isContainer: Boolean) : String {
-        val v = "${ getVersionForLocalChanges( "", "local-"
+        val v = "${ versionForLocalChanges( "", "local-"
                             )}${getBranchNameForVersion(featurePrefix, branch)}"
 
-        return if(isContainer) { v } else { "${ v }-SNAPSHOT" }
+        return if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
     }
 
     private fun versionFromRelease(isContainer: Boolean) : String {
@@ -208,13 +275,13 @@ class GitVersionService @JvmOverloads constructor(
         return if (vb == defaultVersion) {
             val branchName = getBranchNameForVersion(releasePrefix, branch)
             val vrb = Version.forString(branchName, versionType)
-            val v = getVersionForLocalChanges("${vrb}", "${vrb}-local")
-            if(isContainer) { v } else { "${ v }-SNAPSHOT" }
+            val v = versionForLocalChanges("${vrb}", "${vrb}-local")
+            if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
         } else {
-            val addMetaData = getVersionForLocalChanges("", "local")
+            val addMetaData = versionForLocalChanges("", "local")
             if (addMetaData.isNotBlank()) {
                 if(isContainer) {
-                    vb.setBranchMetadata(addMetaData).toString()
+                    vb.setBranchMetadata("${addMetaData}-latest").toString()
                 } else {
                     vb.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
                 }
@@ -234,8 +301,11 @@ class GitVersionService @JvmOverloads constructor(
 
         if(! localOnly) {
             when {
+                isMergeBuild -> {
+                    rv = versionForMergeBranch(false)
+                }
                 tag.isNotBlank() -> {
-                    rv = getVersionForLocalChanges(tag, "${tag}-local-SNAPSHOT")
+                    rv = versionForLocalChanges(tag, "${tag}-local-SNAPSHOT")
                 }
                 branch == mainBranch -> {
                     rv = versionFromMainBranch(false)
@@ -267,7 +337,7 @@ class GitVersionService @JvmOverloads constructor(
                 }
             }
         } else {
-            rv = "local"
+            rv = "LOCAL"
         }
         rv
     }
@@ -281,8 +351,11 @@ class GitVersionService @JvmOverloads constructor(
 
         if(! localOnly) {
             when {
+                isMergeBuild -> {
+                    rv = versionForMergeBranch(true)
+                }
                 tag.isNotBlank() -> {
-                    rv = getVersionForLocalChanges(tag, "${tag}-local")
+                    rv = versionForLocalChanges(tag, "${tag}-local")
                 }
                 branch == mainBranch -> {
                     rv = versionFromMainBranch(true)
@@ -335,7 +408,7 @@ class GitVersionService @JvmOverloads constructor(
 
         reflist.forEach {
             if(it.name.startsWith("refs/heads/")) {
-                branches.add(it.name.substring("refs/heads/".length))
+                branches.add(it.name.substring(headsPrefix.length))
             }
         }
         return branches
@@ -415,7 +488,7 @@ class GitVersionService @JvmOverloads constructor(
         return BigInteger(1, sha.digest(toByteArray())).toString(16).padStart(32, '0')
     }
 
-    private fun getVersionForLocalChanges(version: String, alt: String): String {
+    private fun versionForLocalChanges(version: String, alt: String): String {
         return if(changed) {
             alt
         } else {
