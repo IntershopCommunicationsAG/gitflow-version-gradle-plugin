@@ -32,7 +32,7 @@ import javax.inject.Inject
  */
 open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
                                                 layout: ProjectLayout,
-                                                providerFactory: ProviderFactory ) {
+                                                val providerFactory: ProviderFactory ) {
 
     companion object {
         /**
@@ -240,20 +240,37 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
 
         val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion").
                                                              forUseAtConfigurationTime()
-        val mergeBuild = providerFactory.systemProperty("MERGE_BUILD").
-                                                             forUseAtConfigurationTime()
 
         versionService.localOnly = localVersion.getOrElse("false").lowercase(Locale.getDefault()) == "true"
-        versionService.isMergeBuild = mergeBuild.getOrElse("false").lowercase(Locale.getDefault()) == "true"
 
-        versionService.sourceBranch = providerFactory.systemProperty("PR_SOURCE_BRANCH").
-                                                             forUseAtConfigurationTime().getOrElse("")
-        versionService.pullRequestID = providerFactory.systemProperty("PR_REQUEST_ID").
-                                                             forUseAtConfigurationTime().getOrElse("")
-        versionService.buildID = providerFactory.systemProperty("PR_BUILD_ID").
-                                                             forUseAtConfigurationTime().getOrElse("")
+        versionService.isMergeBuild =
+            getValueFor("MERGE_BUILD", "mergeBuild", "false")
+                .lowercase(Locale.getDefault()) == "true"
+
+        versionService.sourceBranch = getValueFor("PR_SOURCE_BRANCH", "sourceBranch", "")
+        versionService.pullRequestID = getValueFor("PR_ID", "pullRequestID", "")
+        versionService.buildID = getValueFor("PR_BUILD_ID", "pullRequestBuildID", "")
 
         versionService
+    }
+
+    private fun getValueFor(envKey: String, propName: String, default: String): String {
+        val provProp = providerFactory.gradleProperty(propName).forUseAtConfigurationTime()
+        val provSys = providerFactory.systemProperty(envKey).forUseAtConfigurationTime()
+        val provEnv = providerFactory.environmentVariable(envKey).forUseAtConfigurationTime()
+
+        return when {
+                   provProp.orNull != null ->  {
+                       provProp.get()
+                   }
+                   provSys.orNull != null -> {
+                       provSys.get()
+                   }
+                   provEnv.orNull != null -> {
+                       provEnv.get()
+                   }
+                   else -> default
+               }
     }
 
     /**
