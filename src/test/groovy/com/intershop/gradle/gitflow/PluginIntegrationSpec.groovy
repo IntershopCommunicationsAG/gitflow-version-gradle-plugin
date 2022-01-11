@@ -21,7 +21,6 @@ import com.intershop.gradle.gitflow.utils.GitCreatorThreeNumbers
 import com.intershop.gradle.gitflow.utils.TestRepoCreator
 import com.intershop.gradle.test.AbstractIntegrationGroovySpec
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.Rule
 
 class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
@@ -404,6 +403,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         then:
         result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
         result1.output.contains("2.0.0-SNAPSHOT")
+        result1.output.contains("2.0.0-latest")
 
         when:
         File gradleproperties = new File(testProjectDir, "gradle.properties")
@@ -411,7 +411,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
             systemProp.MERGE_BUILD = true
             systemProp.PR_SOURCE_BRANCH = refs/heads/features/team2/45678-merge_message
             systemProp.PR_ID = 409
-            systemProp.PR_BUILD_ID = 12345
+            systemProp.BUILD_ID = 12345
         """.stripIndent()
 
         creator.setBranch("hotfix/team1/12345-message")
@@ -422,7 +422,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result2.output.contains("45678.5956694976-pr409-12345-SNAPSHOT")
+        result2.output.contains("45678.5956694976-pr409-id12345-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions
@@ -455,7 +455,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         creator.setBranch("master")
 
         when:
-        List<String> args = [':showVersion', '-i', '-s']
+        List<String> args = [':showVersion', '-i', '-s', '-PbuildID=456789', '-PuniqueVersion=true']
 
         def result1 = getPreparedGradleRunner()
                 .withArguments(args)
@@ -464,7 +464,8 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result1.output.contains("2.0.0-SNAPSHOT")
+        result1.output.contains("2.0.0-id456789-SNAPSHOT")
+        result1.output.contains("2.0.0-id456789-latest")
 
         when:
         creator.setBranch("hotfix/team1/12345-message")
@@ -473,7 +474,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                                   '-PmergeBuild=true',
                                   '-PsourceBranch=refs/heads/features/team2/147852-merge_message',
                                   '-PpullRequestID=420',
-                                  '-PpullRequestBuildID=456789']
+                                  '-PbuildID=456789']
 
         def result3 = getPreparedGradleRunner()
                 .withArguments(argsextra)
@@ -482,7 +483,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         then:
         result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result3.output.contains("147852.5956694976-pr420-456789-SNAPSHOT")
+        result3.output.contains("147852.5956694976-pr420-id456789-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions
@@ -519,6 +520,66 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         def result1 = getPreparedGradleRunner()
                 .withArguments(args)
+                .withEnvironment([ 'BUILD_ID' : '963258', 'UNIQUE_VERSION' : "true"])
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-id963258-SNAPSHOT")
+        result1.output.contains("2.0.0-id963258-latest")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        def result3 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withEnvironment([ 'MERGE_BUILD' : 'true',
+                               'PR_SOURCE_BRANCH' : 'refs/heads/features/team2/987532-merge_message',
+                               'PR_ID' : '439',
+                               'BUILD_ID' : '963258'])
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result3.output.contains("987532.5956694976-pr439-id963258-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test plugin version for merge request - empty properties'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PbuildID=']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
                 .withGradleVersion(gradleVersion)
                 .build()
 
@@ -529,18 +590,20 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         when:
         creator.setBranch("hotfix/team1/12345-message")
 
+        List<String> argsextra = [':showVersion', '-i', '-s',
+                                  '-PmergeBuild=false',
+                                  '-PsourceBranch=',
+                                  '-PpullRequestID=',
+                                  '-PbuildID=']
+
         def result3 = getPreparedGradleRunner()
-                .withArguments(args)
-                .withEnvironment([ 'MERGE_BUILD' : 'true',
-                               'PR_SOURCE_BRANCH' : 'refs/heads/features/team2/987532-merge_message',
-                               'PR_ID' : '439',
-                               'PR_BUILD_ID' : '963258'])
+                .withArguments(argsextra)
                 .withGradleVersion(gradleVersion)
                 .build()
 
         then:
         result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
-        result3.output.contains("987532.5956694976-pr439-963258-SNAPSHOT")
+        result3.output.contains("12345.6993688732-SNAPSHOT")
 
         where:
         gradleVersion << supportedGradleVersions

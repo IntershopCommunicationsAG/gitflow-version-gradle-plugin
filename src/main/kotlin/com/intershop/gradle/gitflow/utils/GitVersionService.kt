@@ -33,7 +33,6 @@ import java.io.File
 import java.io.IOException
 import java.math.BigInteger
 import java.security.MessageDigest
-import java.util.*
 import java.util.stream.Collectors
 
 /**
@@ -54,6 +53,9 @@ class GitVersionService @JvmOverloads constructor(
         @JvmStatic
         private val log: Logger = LoggerFactory.getLogger(this::class.java.name)
 
+        /**
+         * Git prefix for heads.
+         */
         const val headsPrefix = "refs/heads/"
     }
 
@@ -150,7 +152,7 @@ class GitVersionService @JvmOverloads constructor(
     var pullRequestID: String = ""
 
     /**
-     * Build ID for Pull Requests
+     * Build ID for Pull Requests and unique container version
      * Default value is an empty string. Used to identify a merge build
      */
     var buildID: String = ""
@@ -160,6 +162,12 @@ class GitVersionService @JvmOverloads constructor(
      * Therefore the following environment variables must be set: sourceBranch, pullRequestID, buildID
      */
     var isMergeBuild: Boolean = false
+
+    /**
+     * This must be set to true, if the Container version must be always unique.
+     * Therefore the following environment variables must be set: uniqueContainer, buildID
+     */
+    var isUniqueVersion: Boolean = false
 
     private val changed: Boolean by lazy {
         val status = client.status().call()
@@ -197,13 +205,18 @@ class GitVersionService @JvmOverloads constructor(
         val vm = getLatestVersion()
         val addMetaData = versionForLocalChanges("", "local")
 
+        val uniqueID = if(isUniqueVersion) "id${buildID}-" else ""
+
         return when {
-            vm == defaultVersion && addMetaData.isEmpty() && !isContainer -> vm.setBuildMetadata("SNAPSHOT").toString()
-            addMetaData.isNotBlank() -> if(isContainer) {
-                                            vm.setBranchMetadata(addMetaData).toString()
-                                        } else {
-                                            vm.setBranchMetadata(addMetaData).setBuildMetadata("SNAPSHOT").toString()
-                                        }
+            vm == defaultVersion && addMetaData.isEmpty() && !isContainer ->
+                vm.setBuildMetadata("${uniqueID}SNAPSHOT").toString()
+            vm == defaultVersion && addMetaData.isEmpty() && isContainer ->
+                vm.setBuildMetadata("${uniqueID}latest").toString()
+            addMetaData.isNotBlank() && !isContainer ->
+                vm.setBranchMetadata(addMetaData).setBuildMetadata("${uniqueID}SNAPSHOT").toString()
+            addMetaData.isNotBlank() && isContainer ->
+                vm.setBranchMetadata(addMetaData).setBuildMetadata("${uniqueID}latest").toString()
+
             else -> vm.toString()
         }
     }
@@ -217,13 +230,13 @@ class GitVersionService @JvmOverloads constructor(
         if (buildID.isEmpty()) {
             log.warn("The build ID is not specified for the version calculation for a pull request")
         }
-        var mBranchName = if (sourceBranch.startsWith(headsPrefix)) {
+        val mBranchName = if (sourceBranch.startsWith(headsPrefix)) {
             sourceBranch.substring(headsPrefix.length)
         } else {
             sourceBranch
         }
 
-        var bBranchName = when {
+        val bBranchName = when {
             mBranchName.startsWith(featurePrefix) -> {
                 getBranchNameForVersion(featurePrefix, mBranchName)
             }
@@ -242,17 +255,18 @@ class GitVersionService @JvmOverloads constructor(
         }
 
         return if(isContainer) {
-                    "${bBranchName}-pr${pullRequestID}-${buildID}-latest"
+                    "${bBranchName}-pr${pullRequestID}-id${buildID}-latest"
                 } else {
-                    "${bBranchName}-pr${pullRequestID}-${buildID}-SNAPSHOT"
+                    "${bBranchName}-pr${pullRequestID}-id${buildID}-SNAPSHOT"
                 }
     }
 
     private fun versionFromDevBranch(isContainer: Boolean) : String {
+        val uniqueID = if(isUniqueVersion) "-id${buildID}-" else ""
         return if(isContainer) {
-            "${versionForLocalChanges("dev", "local-dev")}-latest"
+            "${versionForLocalChanges("dev", "local-dev")}${uniqueID}-latest"
         } else {
-            "${versionForLocalChanges("dev", "local-dev")}-SNAPSHOT"
+            "${versionForLocalChanges("dev", "local-dev")}${uniqueID}-SNAPSHOT"
         }
     }
 
@@ -594,7 +608,7 @@ class GitVersionService @JvmOverloads constructor(
     private fun getPreviousVersionFromTags(): Version? {
         var previousVersion: Version? = null
 
-        var calcPrevVer = if(! branch.startsWith(featurePrefix) &&
+        val calcPrevVer = if(! branch.startsWith(featurePrefix) &&
             ! branch.startsWith(hotfixPrefix) &&
             ! branch.startsWith(releasePrefix) &&
             branch != developBranch &&  branch != mainBranch) {
