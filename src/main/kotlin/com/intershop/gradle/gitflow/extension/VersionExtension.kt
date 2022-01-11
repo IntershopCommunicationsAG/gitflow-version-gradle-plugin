@@ -29,6 +29,7 @@ import javax.inject.Inject
  * This is the extension of this plugin.
  * @param objectFactory factory for objects
  * @param layout directory layout
+ * @param providerFactory provider factory for gradle
  */
 open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
                                                 layout: ProjectLayout,
@@ -56,11 +57,6 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     private val branchProperty = objectFactory.property(String::class.java)
     private val previousVersionProperty = objectFactory.property(String::class.java)
     private val containerVersionProperty = objectFactory.property(String::class.java)
-
-    private val isMergeBranchProperty = objectFactory.property(Boolean::class.java)
-    private val sourceBranchProperty = objectFactory.property(String::class.java)
-    private val pullRequestIDProperty = objectFactory.property(String::class.java)
-    private val buildIDProperty = objectFactory.property(String::class.java)
 
     init {
         defaultVersionProperty.convention("1.0.0")
@@ -211,12 +207,6 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         set(value) = fullbranchProperty.set(value)
 
     /**
-     * Pull request ID of pull request
-     */
-    val pullRequestID : String
-        get() = pullRequestIDProperty.getOrElse("")
-
-    /**
      * This is the service for version calculation.
      */
     val versionService: GitVersionService by lazy {
@@ -247,9 +237,14 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
             getValueFor("MERGE_BUILD", "mergeBuild", "false")
                 .lowercase(Locale.getDefault()) == "true"
 
+        versionService.isUniqueVersion =
+            getValueFor("UNIQUE_VERSION", "uniqueVersion", "false")
+                .lowercase(Locale.getDefault()) == "true"
+
         versionService.sourceBranch = getValueFor("PR_SOURCE_BRANCH", "sourceBranch", "")
         versionService.pullRequestID = getValueFor("PR_ID", "pullRequestID", "")
-        versionService.buildID = getValueFor("PR_BUILD_ID", "pullRequestBuildID", "")
+
+        versionService.buildID = getValueFor("BUILD_ID", "buildID", "")
 
         versionService
     }

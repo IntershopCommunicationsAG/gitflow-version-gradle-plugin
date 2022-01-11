@@ -32,9 +32,19 @@ open class ShowVersion: DefaultTask() {
     fun run() {
         val versionExt = project.extensions.getByType(VersionExtension::class.java)
         val preVersion = versionExt.previousVersion
+        val containerVersion = versionExt.containerVersion
+
         println("------------------------------------------------------------------")
         println("-- GitFlow version is")
         println("--   " + project.version)
+
+        if(containerVersion.isNotEmpty()) {
+            println("-- GitFlow container version is")
+            println("--   " + versionExt.containerVersion)
+        } else {
+            println("-- GitFlow container version is not available!")
+        }
+
         if(preVersion.isNotEmpty()) {
             println("-- GitFlow previous version is")
             println("--   " + versionExt.previousVersion)
