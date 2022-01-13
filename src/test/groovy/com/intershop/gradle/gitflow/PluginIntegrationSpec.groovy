@@ -5,218 +5,607 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- *  limitations under the License.
+ * limitations under the License.
  */
 package com.intershop.gradle.gitflow
 
+import com.intershop.gradle.gitflow.utils.GitCreatorChangedDefaultNames
+import com.intershop.gradle.gitflow.utils.GitCreatorSpecialPath
+import com.intershop.gradle.gitflow.utils.GitCreatorThreeNumbers
 import com.intershop.gradle.gitflow.utils.TestRepoCreator
 import com.intershop.gradle.test.AbstractIntegrationGroovySpec
-import org.eclipse.jgit.lib.Constants
-import spock.lang.Shared
+import org.gradle.testkit.runner.TaskOutcome
 
+class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
-class GitIntegrationSpec extends AbstractIntegrationGroovySpec {
-    @Shared
-    TestRepoCreator creator = new TestRepoCreator(testProjectDir)
-
-    def 'test 1 - no release'() {
-        given:
+    TestRepoCreator createTest1(File dir, String buildFileContent)  {
+        TestRepoCreator creator = new TestRepoCreator(dir)
+        //add build files
+        creator.addBuildGroovyFile(buildFileContent)
 
         def cMaster = creator.createCommits("master", 2)
+
         creator.createBranch("develop", cMaster)
         def cDevelop = creator.createCommits("develop", 2)
 
         creator.setBranch("master")
-        creator.createBranch("hotfix/JIRA-1", cDevelop)
+        creator.createBranch("hotfix/JIRA-1", cMaster)
         creator.createCommits("jira1", 2)
 
         creator.setBranch("develop")
         creator.createBranch("feature/JIRA-2", cDevelop)
         creator.createCommits("jira2", 3)
 
-        when:
-        creator.setBranch("master")
-        VersionRunner vr = new VersionRunner(testProjectDir.absolutePath)
-        vr.run()
-
-        then:
-        true
-
-        when:
-        creator.setBranch("develop")
-        vr = new VersionRunner(testProjectDir.absolutePath)
-        vr.run()
-
-        then:
-        true
-
-        when:
-        creator.setBranch("hotfix/JIRA-1")
-        vr = new VersionRunner(testProjectDir.absolutePath)
-        vr.run()
-
-        then:
-        true
-
-        when:
-        creator.setBranch("feature/JIRA-2")
-        vr = new VersionRunner(testProjectDir.absolutePath)
-        vr.run()
-
-        then:
-        true
+        return creator
     }
 
-    def createPrimaryGitRepo() {
-        TestRepoCreator creator = new TestRepoCreator(testProjectDir)
-
-        def cMaster = creator.createCommits("master", 2)
-        creator.createBranch("develop", cMaster)
-        def cDevelop = creator.createCommits("develop", 2)
-
-        creator.setBranch("master")
-        creator.createBranch("hotfix/JIRA-1", cDevelop)
-        creator.createCommits("jira1", 2)
-
-        creator.setBranch("develop")
-        creator.createBranch("feature/JIRA-2", cDevelop)
-        creator.createCommits("jira2", 3)
-
-        creator.merge("master", "hotfix/JIRA-1", "feature JIRA-1 merge")
-        creator.setBranch("develop")
-        creator.createCommits("develop1", 2)
-        creator.createBranch("feature/JIRA-3", cDevelop)
-        creator.createCommits("jira3", 2)
-
-        creator.merge("develop", "master", "sync after JIRA 1")
-
-        creator.setBranch("feature/JIRA-2")
-        creator.createCommits("jira21", 1)
-        def cFeature2 = creator.merge("develop", "feature/JIRA-2", "feature JIRA-2 merge")
-
-        creator.setBranch("develop")
-        creator.createBranch("release/7.11", cFeature2)
-        creator.createCommits("develop2", 1)
-
-        creator.setBranch("release/7.11")
-        def cRelease = creator.createCommits("release711", 2)
-
-        creator.createBranch("hotfix/JIRA-4", cRelease)
-        creator.setBranch("hotfix/JIRA-4")
-        creator.createCommits("jira4hotfix", 2)
-
-        creator.setBranch("develop")
-        def cDevelop2 = creator.createCommits("develop3", 1)
-        creator.createBranch("feature/JIRA-5", cDevelop2)
-        creator.setBranch("feature/JIRA-5")
-        creator.createCommits("jira5", 2)
-
-        creator.merge("release/7.11", "hotfix/JIRA-4", "merge hotfix to release 711")
-        def cRelease711M = creator.merge("master", "release/7.11", "merge release 711 to master")
-
-        creator.setBranch("master")
-        creator.createTag("version/7.11.0.0", "create release tag", cRelease711M)
-        creator.createBranch("hotifx/JIRA-6", Constants.HEAD)
-
-        creator.setBranch("hotifx/JIRA-6")
-        creator.createCommits("jira6", 2)
-
-        creator.setBranch("develop")
-        def cDevelop1 = creator.createCommits("develop4", 2)
-        creator.createBranch("feature/JIRA-5", cDevelop1)
-        creator.createCommits("develop5", 1)
-
-        creator.setBranch("master")
-        creator.merge("develop", "release/7.11",  "merge release 711 to develop")
-        creator.removeBranch("release/7.11")
-
-        creator.setBranch("feature/JIRA-3")
-        creator.createCommits("jira32", 2)
-        def cFeature3 = creator.merge("develop", "feature/JIRA-3", "feature JIRA-3 merge")
-        creator.createBranch("release/7.11", cFeature3)
-        creator.createCommits("release2", 1)
-
-        creator.setBranch("hotifx/JIRA-6")
-        creator.createCommits("jira61", 2)
-        def cHotfix6 = creator.merge("master", "hotifx/JIRA-6",  "merge hotfix JIRA6 to master")
-        creator.createTag("version/7.11.0.1", "create release tag", cHotfix6)
-
-        creator.merge("develop", "master",  "merge release 711 hotfix 6 to develop")
-        creator.merge("release/7.11", "master",  "merge release 711 hotfix 6 to develop")
-
-        creator.setBranch("develop")
-        creator.createCommits("develop5", 2)
-
-        creator.setBranch("release/7.11")
-        creator.createCommits("release3", 2)
-
-        creator.setBranch("develop")
-        creator.createCommits("release2", 1)
-
-        def cRelease2 = creator.merge("master", "release/7.11", "merge release 711 to master")
-        creator.createTag("version/7.11.1.0", "create release tag", cRelease2)
-
-        creator.merge("develop", "release/7.11",  "merge release 711 to develop")
-        creator.removeBranch("release/7.11")
-
-        creator.setBranch("feature/JIRA-5")
-        creator.createCommits("jira51", 2)
-        def cFeature5 = creator.merge("develop", "feature/JIRA-5",  "merge feature JIRA5 to develop")
-
-        creator.createBranch("release/7.11", cRelease2)
-        creator.createBranch("hotfix/JIRA-7", cRelease2)
-
-        creator.setBranch("hotfix/JIRA-7")
-        creator.createCommits("jira7", 2)
-
-        creator.createBranch("release/7.12", cFeature5)
-        creator.createCommits("release712", 2)
-
-
-        def cRelease3 = creator.merge("master", "release/7.12", "merge release 711 to master")
-        creator.merge("develop", "release/7.12",  "merge release 711 to develop")
-
-        creator.removeBranch("release/7.12")
-
-        creator.setBranch("master")
-        creator.createTag("version/7.12.0.0", "create release tag", cRelease3)
-
-        creator.setBranch("hotfix/JIRA-7")
-        creator.createCommits("jira71", 2)
-
-        def cRelease4 = creator.merge("release/7.11", "hotfix/JIRA-7",  "merge hotfix to release")
-        creator.merge("master", "hotfix/JIRA-7", "merge release 711 to master")
-        creator.merge("develop", "hotfix/JIRA-7",  "merge release 711 to develop")
-
-        creator.setBranch("release/7.11")
-        creator.createTag("version/7.11.1.1", "create release tag", cRelease4)
-
-    }
-
-    def 'test git util creation'() {
+    def 'initial plugin integration test'() {
         given:
-            createPrimaryGitRepo(testProjectDir)
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorThreeNumbers.initGitRepo(testProjectDir, buildFileContent)
+        String cid = creator.setBranch("master")
+        creator.gitidCheckout(cid)
+
         when:
-            VersionRunner vr = new VersionRunner(testProjectDir.absolutePath)
-            vr.run()
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
 
         then:
-            true
+        result1.output.contains("1.0.0-SNAPSHOT")
+        result1.output.contains("GitFlow previous version is not available!")
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+
+        when:
+        List<String> args2 = [':createChangeLog', '-i', '-s']
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args2)
+                .withGradleVersion(gradleVersion)
+                .build()
+        File resultFile = new File(testProjectDir, "build/changelog/changelog.md")
+
+        then:
+        result2.task(":createChangeLog").outcome == TaskOutcome.SUCCESS
+        resultFile.exists()
+        resultFile.text.contains("This list contains changes since beginning.")
+
+        where:
+        gradleVersion << supportedGradleVersions
     }
 
-    def 'test git with file dir'() {
+    def 'test path with team'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
 
         when:
-        VersionRunner vr = new VersionRunner(testProjectDir.absolutePath)
-        vr.run()
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
 
         then:
-        true
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("12345.6993688732-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test path with team - shortend'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+                
+                fullbranch = true
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("12345-message-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test path with team - long descr shortend'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithLongNames(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message_ddfdffearer-erwrwear-efdgfwewrwerwe-ewwerwerwer")
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("12345.9293237624-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345_message_ddfdffearer-ereterwrwear-ewewrwerwe-ewwerwerwer")
+
+        def result3 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result3.output.contains("12345.6889844814-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'plugin configuration integration test'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "trunk"
+                developBranch = "prerelease"
+                hotfixPrefix = "bugfix"
+                featurePrefix = "story"
+                releasePrefix = "prepared"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorChangedDefaultNames.initTest15(testProjectDir, buildFileContent)
+        String cid = creator.setBranch("trunk")
+        creator.gitidCheckout(cid)
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.output.contains("5.0.0")
+        result1.output.contains("4.1.0")
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+
+        when:
+        List<String> args2 = [':createChangeLog', '-i', '-s']
+
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args2)
+                .withGradleVersion(gradleVersion)
+                .build()
+        File resultFile = new File(testProjectDir, "build/changelog/changelog.md")
+
+        then:
+        result2.task(":createChangeLog").outcome == TaskOutcome.SUCCESS
+        resultFile.exists()
+        resultFile.text.contains("This list contains changes since 4.1.0.")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'plugin for development'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorThreeNumbers.initGitRepo(testProjectDir, buildFileContent)
+        String cid = creator.setBranch("master")
+        creator.gitidCheckout(cid)
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PlocalVersion=true']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.output.contains("LOCAL")
+        result1.output.contains("GitFlow previous version is not available!")
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test plugin version for merge request - systemprop'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+        result1.output.contains("2.0.0-latest")
+
+        when:
+        File gradleproperties = new File(testProjectDir, "gradle.properties")
+        gradleproperties << """
+            systemProp.MERGE_BUILD = true
+            systemProp.PR_SOURCE_BRANCH = refs/heads/features/team2/45678-merge_message
+            systemProp.PR_ID = 409
+            systemProp.BUILD_ID = 12345
+        """.stripIndent()
+
+        creator.setBranch("hotfix/team1/12345-message")
+        def result2 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result2.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result2.output.contains("45678.5956694976-pr409-id12345-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test plugin version for merge request - properties'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PbuildID=456789', '-PuniqueVersion=true']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-id456789-SNAPSHOT")
+        result1.output.contains("2.0.0-id456789-latest")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        List<String> argsextra = [':showVersion', '-i', '-s',
+                                  '-PmergeBuild=true',
+                                  '-PsourceBranch=refs/heads/features/team2/147852-merge_message',
+                                  '-PpullRequestID=420',
+                                  '-PbuildID=456789']
+
+        def result3 = getPreparedGradleRunner()
+                .withArguments(argsextra)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result3.output.contains("147852.5956694976-pr420-id456789-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test plugin version for merge request - environment'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withEnvironment([ 'BUILD_ID' : '963258', 'UNIQUE_VERSION' : "true"])
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-id963258-SNAPSHOT")
+        result1.output.contains("2.0.0-id963258-latest")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        def result3 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withEnvironment([ 'MERGE_BUILD' : 'true',
+                               'PR_SOURCE_BRANCH' : 'refs/heads/features/team2/987532-merge_message',
+                               'PR_ID' : '439',
+                               'BUILD_ID' : '963258'])
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result3.output.contains("987532.5956694976-pr439-id963258-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test plugin version for merge request - empty properties'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "features"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+            
+            
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PbuildID=']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("2.0.0-SNAPSHOT")
+
+        when:
+        creator.setBranch("hotfix/team1/12345-message")
+
+        List<String> argsextra = [':showVersion', '-i', '-s',
+                                  '-PmergeBuild=false',
+                                  '-PsourceBranch=',
+                                  '-PpullRequestID=',
+                                  '-PbuildID=']
+
+        def result3 = getPreparedGradleRunner()
+                .withArguments(argsextra)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result3.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result3.output.contains("12345.6993688732-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
     }
 }

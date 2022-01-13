@@ -24,6 +24,7 @@ import org.eclipse.jgit.api.TagCommand
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.revwalk.RevObject
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.lib.Constants
 
@@ -35,11 +36,32 @@ class TestRepoCreator {
 
     TestRepoCreator(File directory) {
         repoDir = directory
+        if(repoDir.exists()) {
+            repoDir.deleteDir()
+        } else {
+            repoDir.mkdirs()
+        }
+
         git = Git.init().setDirectory(repoDir).call()
         log.info("created repo: " + git.getRepository().getDirectory())
         git.add().addFilepattern(".").call()
         git.commit().setMessage("Initial commit").call()
-        log.info("Committed repository " + git.getRepository().getDirectory());
+        log.info("Committed repository " + git.getRepository().getDirectory())
+    }
+
+    void renameBranch(String name) {
+        def renamecmd = git.branchRename()
+        renamecmd.oldName = "master"
+        renamecmd.newName = name
+        renamecmd.call()
+    }
+
+    File getDirectory() {
+        return repoDir
+    }
+
+    String getDirectoryPath() {
+        return repoDir.absolutePath
     }
 
     String createCommits(String prefix, int count) {
@@ -51,7 +73,7 @@ class TestRepoCreator {
             if (! file.createNewFile()) {
                 throw new IOException("Could not create file " + fileName)
             }
-            git.add().addFilepattern(fileName).call();
+            git.add().addFilepattern(fileName).call()
             RevCommit commit = git.commit().setMessage("Commit file " + fileName).call()
             rv = commit.getName()
             log.info("Committed file " + fileName + " to repository at " + git.getRepository().getDirectory())
@@ -65,8 +87,11 @@ class TestRepoCreator {
         git.checkout().setName(branchName).call()
     }
 
-    void setBranch(String branchName) {
-        git.checkout().setName(branchName).call()
+    String setBranch(String branchName) {
+        Ref returnValue = git.checkout().setName(branchName).call()
+        RevWalk walk = new RevWalk(git.repository)
+        RevObject rv = walk.parseAny(returnValue.objectId)
+        return rv.name()
     }
 
     String merge(String targetBranch, String srcBranch, String msg) {
@@ -85,7 +110,9 @@ class TestRepoCreator {
     }
 
     String removeBranch(String branchName) {
-        git.branchDelete().setBranchNames(Constants.R_HEADS + branchName).call();
+        def cmd = git.branchDelete()
+        cmd.force = true
+        cmd.setBranchNames(Constants.R_HEADS + branchName).call();
     }
 
     void createTag(String tagname, String msg, String rev) {
@@ -102,5 +129,34 @@ class TestRepoCreator {
 
         Ref ref = cmd.call()
         log.info("Tag " + tagname + " created by jgit: " + ref)
+    }
+
+    void addBuildGroovyFile(String content) {
+        File buildFile = new File(repoDir, "build.gradle")
+        File settingsFile = new File(repoDir, "settings.gradle")
+        File gitIgnore = new File(repoDir,".gitignore")
+
+        buildFile << content
+
+        gitIgnore << """
+        # Gradle Files
+        .gradle
+        build/
+        """.stripIndent()
+
+        settingsFile << """
+        rootProject.name = 'test-project'
+        """.stripIndent()
+
+        git.add().addFilepattern(".gitignore").call()
+        git.add().addFilepattern("build.gradle").call()
+        git.add().addFilepattern("settings.gradle").call()
+
+        git.commit().setMessage("Commit gradle files").call()
+        log.info("Committed gradle files to repository at " + git.getRepository().getDirectory())
+    }
+
+    void gitidCheckout(String id) {
+        git.checkout().setName( id ).call()
     }
 }
