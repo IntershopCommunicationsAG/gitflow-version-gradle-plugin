@@ -262,7 +262,7 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun versionFromDevBranch(isContainer: Boolean) : String {
-        val uniqueID = if(isUniqueVersion) "-id${buildID}-" else ""
+        val uniqueID = if(isUniqueVersion) "-id${buildID}" else ""
         return if(isContainer) {
             "${versionForLocalChanges("dev", "local-dev")}${uniqueID}-latest"
         } else {
