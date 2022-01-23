@@ -139,8 +139,8 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         
         Created: ${LocalDateTime.now()}
 
-        | Change | Type |
-        | :--------------- | :----- |
+        | Change | Type | Commit |
+        | :--------------- | :----- | :----- |
         
         """.trimIndent()
     }
@@ -167,18 +167,30 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
             DiffEntry.ChangeType.ADD -> getFileLine(e.newPath, "A")
             DiffEntry.ChangeType.DELETE -> getFileLine(e.oldPath, "D")
             DiffEntry.ChangeType.MODIFY -> getFileLine(e.newPath, "M")
-            DiffEntry.ChangeType.COPY -> getFileLine("${e.oldPath} ->\n${e.newPath} (${e.score})", "C")
-            DiffEntry.ChangeType.RENAME -> getFileLine("${e.oldPath} ->\n${e.newPath} (${e.score})", "R")
+            DiffEntry.ChangeType.COPY -> getFileLine("${e.oldPath} -><br/>${e.newPath} (${e.score})", "C")
+            DiffEntry.ChangeType.RENAME -> getFileLine("${e.oldPath} -><br/>${e.newPath} (${e.score})", "R")
             else -> "unknown change"
         }
     }
 
     private fun getFileLine(path: String, changeType: String): String {
-        return "| +- `$path` | $changeType | \n"
+        return "|&nbsp;&nbsp;&nbsp;&nbsp;`$path` | $changeType | \n"
     }
 
     private fun getMessageLine(message: String, rev: String): String {
-        return "| **$message** | (${rev}) | \n"
+        val buffer = StringBuilder()
+        var firstLine = true
+
+        message.lines().forEach {
+            if(firstLine) {
+                buffer.append("**$it**")
+                firstLine = false
+            } else {
+                buffer.append("<br/>").append(it)
+            }
+        }
+
+        return "| $buffer  | | (${rev}) | \n"
     }
 
     /**
