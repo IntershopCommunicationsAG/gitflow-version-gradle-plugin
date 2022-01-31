@@ -50,7 +50,7 @@ plugins {
 // release configuration
 group = "com.intershop.gradle.version"
 description = "Gradle SCM version plugin - SCM based version handling for Gradle"
-version = "1.7.2"
+version = "1.7.3"
 
 val sonatypeUsername: String by project
 val sonatypePassword: String? by project
