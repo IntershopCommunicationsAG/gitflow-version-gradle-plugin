@@ -152,13 +152,23 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         diffFmt.isDetectRenames = true
 
         val rw = RevWalk(repo)
-        rw.parseHeaders(commit.getParent(0))
 
-        val a = commit.getParent(0).tree
-        val b = commit.tree
+        var parent: RevCommit? = null
+        try {
+            parent = commit.getParent(0)
+        } catch (aioe: ArrayIndexOutOfBoundsException) {
+            project.logger.info("No more parent available!")
+        }
 
-        diffFmt.scan(a, b).forEach {  e: DiffEntry ->
-            changelogFile.appendText( processDiffEntry(e) )
+        if(parent != null) {
+            rw.parseHeaders(parent)
+
+            val a = parent.tree
+            val b = commit.tree
+
+            diffFmt.scan(a, b).forEach {  e: DiffEntry ->
+                changelogFile.appendText( processDiffEntry(e) )
+            }
         }
     }
 
