@@ -90,7 +90,7 @@ tasks {
     withType<Test>().configureEach {
         maxParallelForks = 1
 
-        systemProperty("intershop.gradle.versions", "7.2")
+        systemProperty("intershop.gradle.versions", "7.2,7.5.1")
         useJUnitPlatform()
     }
 
