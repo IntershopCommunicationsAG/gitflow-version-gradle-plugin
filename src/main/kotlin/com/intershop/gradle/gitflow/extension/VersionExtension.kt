@@ -228,8 +228,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionService.separator = separatorProperty.get()
         versionService.fullbranch = fullbranchProperty.get()
 
-        val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion").
-                                                             forUseAtConfigurationTime()
+        val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion")
 
         versionService.localOnly = localVersion.getOrElse("false").lowercase(Locale.getDefault()) == "true"
 
@@ -250,9 +249,9 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     }
 
     private fun getValueFor(envKey: String, propName: String, default: String): String {
-        val provProp = providerFactory.gradleProperty(propName).forUseAtConfigurationTime()
-        val provSys = providerFactory.systemProperty(envKey).forUseAtConfigurationTime()
-        val provEnv = providerFactory.environmentVariable(envKey).forUseAtConfigurationTime()
+        val provProp = providerFactory.gradleProperty(propName)
+        val provSys = providerFactory.systemProperty(envKey)
+        val provEnv = providerFactory.environmentVariable(envKey)
 
         return when {
                    provProp.orNull != null ->  {

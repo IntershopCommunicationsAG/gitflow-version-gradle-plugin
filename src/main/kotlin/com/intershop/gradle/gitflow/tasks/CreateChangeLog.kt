@@ -157,7 +157,7 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         try {
             parent = commit.getParent(0)
         } catch (aioe: ArrayIndexOutOfBoundsException) {
-            project.logger.info("No more parent available!")
+            project.logger.info("No more parent available! ({})", aioe.message)
         }
 
         if(parent != null) {

@@ -57,6 +57,9 @@ class GitVersionService @JvmOverloads constructor(
          * Git prefix for heads.
          */
         const val headsPrefix = "refs/heads/"
+        const val stringLength = 10
+        const val shaLength = 32
+        const val radixLength = 16
     }
 
     /**
@@ -311,7 +314,7 @@ class GitVersionService @JvmOverloads constructor(
     val version: String by lazy {
 
         val tag = getVersionTagFrom(Constants.HEAD)
-        var rv = ""
+        var rv: String
 
         if(! localOnly) {
             when {
@@ -361,7 +364,7 @@ class GitVersionService @JvmOverloads constructor(
      */
     val containerVersion: String by lazy {
         val tag = getVersionTagFrom(Constants.HEAD)
-        var rv = ""
+        var rv: String
 
         if(! localOnly) {
             when {
@@ -400,6 +403,8 @@ class GitVersionService @JvmOverloads constructor(
                     }
                 }
             }
+        } else {
+            rv = "LOCAL"
         }
 
         rv
@@ -488,9 +493,9 @@ class GitVersionService @JvmOverloads constructor(
 
             return if(number.isNotEmpty() && this.length > number.length) {
                 number + "." + this.substring(number.length + 1).sha().
-                                replace("[a-z]".toRegex(), "").substring(0,10)
+                                replace("[a-z]".toRegex(), "").substring(0, stringLength)
             } else {
-                this.sha().replace("[a-z]".toRegex(), "").substring(0,10)
+                this.sha().replace("[a-z]".toRegex(), "").substring(0,stringLength)
             }
         } else {
             this
@@ -499,7 +504,7 @@ class GitVersionService @JvmOverloads constructor(
 
     private fun String.sha(): String {
         val sha = MessageDigest.getInstance("SHA-1")
-        return BigInteger(1, sha.digest(toByteArray())).toString(16).padStart(32, '0')
+        return BigInteger(1, sha.digest(toByteArray())).toString(radixLength).padStart(shaLength, '0')
     }
 
     private fun versionForLocalChanges(version: String, alt: String): String {

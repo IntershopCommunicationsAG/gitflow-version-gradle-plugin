@@ -20,7 +20,7 @@ plugins {
     // project plugins
     `java-gradle-plugin`
     groovy
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.7.10"
 
     // test coverage
     jacoco
@@ -38,31 +38,25 @@ plugins {
     id("org.asciidoctor.jvm.convert") version "3.3.2"
 
     // documentation
-    id("org.jetbrains.dokka") version "1.4.32"
+    id("org.jetbrains.dokka") version "1.7.10"
 
     // code analysis for kotlin
-    id("io.gitlab.arturbosch.detekt") version "1.17.1"
+    id("io.gitlab.arturbosch.detekt") version "1.21.0"
 
     // plugin for publishing to Gradle Portal
-    id("com.gradle.plugin-publish") version "0.15.0"
+    id("com.gradle.plugin-publish") version "1.0.0"
 }
 
 // release configuration
 group = "com.intershop.gradle.version"
 description = "Gradle SCM version plugin - SCM based version handling for Gradle"
-version = "1.7.3"
+version = "1.7.4"
 
 val sonatypeUsername: String by project
 val sonatypePassword: String? by project
 
 repositories {
     mavenCentral()
-    jcenter()
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 gradlePlugin {
@@ -88,15 +82,15 @@ if (project.version.toString().endsWith("-SNAPSHOT")) {
 }
 
 detekt {
-    input = files("src/main/kotlin")
-    config = files("detekt.yml")
+    source = files("src/main/kotlin")
+    config = files("config/detekt/detekt.yml")
 }
 
 tasks {
     withType<Test>().configureEach {
         maxParallelForks = 1
 
-        systemProperty("intershop.gradle.versions", "7.2")
+        systemProperty("intershop.gradle.versions", "7.2,7.5.1")
         useJUnitPlatform()
     }
 
@@ -167,17 +161,21 @@ tasks {
         outputDirectory.set(buildDir.resolve("dokka"))
     }
 
-    register<Jar>("sourceJar") {
-        description = "Creates a JAR that contains the source code."
-
-        from(sourceSets.getByName("main").allSource)
-        archiveClassifier.set("sources")
+    withType<Sign> {
+        val sign = this
+        withType<PublishToMavenLocal> {
+            this.dependsOn(sign)
+        }
+        withType<PublishToMavenRepository> {
+            this.dependsOn(sign)
+        }
     }
 
-    register<Jar>("javaDoc") {
-        dependsOn(dokkaJavadoc)
-        from(dokkaJavadoc)
-        archiveClassifier.set("javadoc")
+    afterEvaluate {
+        getByName<Jar>("javadocJar") {
+            dependsOn(dokkaJavadoc)
+            from(dokkaJavadoc)
+        }
     }
 }
 
@@ -186,8 +184,6 @@ publishing {
         create("intershopMvn", MavenPublication::class.java) {
 
             from(components["java"])
-            artifact(tasks.getByName("sourceJar"))
-            artifact(tasks.getByName("javaDoc"))
 
             artifact(File(buildDir, "docs/asciidoc/html5/README.html")) {
                 classifier = "reference"
@@ -245,7 +241,7 @@ signing {
 }
 
 dependencies {
-    implementation("com.intershop.gradle.version:extended-version:3.0.3")
+    implementation("com.intershop.gradle.version:extended-version:3.1.0")
     implementation(gradleKotlinDsl())
     implementation(kotlin("stdlib-jdk8"))
 
