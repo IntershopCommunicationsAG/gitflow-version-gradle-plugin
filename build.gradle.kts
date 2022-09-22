@@ -94,7 +94,7 @@ tasks {
         useJUnitPlatform()
     }
 
-    val copyAsciiDoc = register<Copy>("copyAsciiDoc") {
+    register<Copy>("copyAsciiDoc") {
         includeEmptyDirs = false
 
         val outputDir = file("$buildDir/tmp/asciidoctorSrc")
@@ -153,7 +153,7 @@ tasks {
 
     getByName("jar").dependsOn("asciidoctor")
 
-    val compileKotlin by getting(KotlinCompile::class) {
+    withType<KotlinCompile>  {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
