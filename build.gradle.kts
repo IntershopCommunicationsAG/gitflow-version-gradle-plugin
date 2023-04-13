@@ -50,7 +50,7 @@ plugins {
 // release configuration
 group = "com.intershop.gradle.version"
 description = "Gradle SCM version plugin - SCM based version handling for Gradle"
-version = "1.7.4"
+version = "1.7.5"
 
 val sonatypeUsername: String by project
 val sonatypePassword: String? by project
@@ -73,7 +73,7 @@ gradlePlugin {
 pluginBundle {
     website = "https://github.com/IntershopCommunicationsAG/${project.name}"
     vcsUrl = "https://github.com/IntershopCommunicationsAG/${project.name}"
-    tags = listOf("intershop", "gradle", "plugin", "version", "release")
+    tags = listOf("intershop", "version", "release")
 }
 
 // set correct project status
@@ -94,7 +94,7 @@ tasks {
         useJUnitPlatform()
     }
 
-    val copyAsciiDoc = register<Copy>("copyAsciiDoc") {
+    register<Copy>("copyAsciiDoc") {
         includeEmptyDirs = false
 
         val outputDir = file("$buildDir/tmp/asciidoctorSrc")
@@ -153,7 +153,7 @@ tasks {
 
     getByName("jar").dependsOn("asciidoctor")
 
-    val compileKotlin by getting(KotlinCompile::class) {
+    withType<KotlinCompile>  {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
