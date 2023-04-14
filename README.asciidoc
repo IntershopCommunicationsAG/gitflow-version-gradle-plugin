@@ -10,40 +10,40 @@ This plugin calculates the version from the Git repository. The plugin assumes t
 
 image::images/gitflow_example.svg[]
 
-The version depends on the local repository and the current active branch and the tag. Furthermore, the plugin checks the local sources if there are uncommitted changes in the source repository.
+The version depends on the local repository, and the current active branch, and the tag. Furthermore, the plugin checks the local sources if there are uncommitted changes in the source repository.
 
 With the task `showVersion` it is possible to check the current version. Please switch to the info log level if you need more information about the calculation.
 
 == Plugin Extension "gitflowVersion"
 
-It is possible to configure the separator, prefixes and branch names and type of version. With one Gradle property it is possible to change the
+It is possible to configure the separator, prefixes, branch names, and type of version. With one Gradle property it is possible to change the
 version to "local".
 
 === Gradle Properties
 [cols="20%,15%,15%,50%", width="95%", options="header"]
 |===
 |Property           | Type   | Default value | Description
-|localVersion       | String | ""            | If this value is 'true', the version is always "LOCAL". This can be used for local development and configured in the user gradle.properties file.
+|localVersion       | String | ""            | If this value is 'true', the version is always "LOCAL". This can be used for local development and configured in the user gradle.properties file
 |===
 
 === Properties
 [cols="20%,15%,15%,50%", width="95%", options="header"]
 |===
 |Property           | Type   | Default value | Description
-|*defaultVersion*   | String | 1.0.0         | This is the default version if no other information is available.
-|*mainBranch*       | String | master        | Name of the main branch, used for releae version
+|*defaultVersion*   | String | 1.0.0         | This is the default version if no other information is available
+|*mainBranch*       | String | master        | Name of the main branch, used for release version
 |*developBranch*    | String | develop       | Name of the developer branch, used for integration
 |*hotfixPrefix*     | String | hotfix        | Prefix for hotfix branches, used for bug fix development
 |*featurePrefix*    | String | feature       | Prefix for feature branches, used for feature development
 |*releasePrefix*    | String | release       | Prefix for release branches, used for release preparation
 |*versionPrefix*    | String | version       | Prefix for version tags
 |*separator*        | String | /             | Separator for branches and tags
-|*versionType*      | String | three         | Type of the version - *three* digits or *four* digits version number Possible values are `three` or `four`.
-|*versionService*   | String | (read only)   | The service for version calculation.
-|*version*          | String | (read only)   | This is the calculated version.
-|*previousVersion*  | String | (read only)   | This is the calculated previous version on the branch.
-|*branchName*       | String | (read only)   | This is the current branch name.
-|*fullbranch*        | Boolean | false        | If this is true, the branch name is used as a part of the version.
+|*versionType*      | String | three         | Type of the version - *three* digits or *four* digits version number. Possible values are `three` or `four`
+|*versionService*   | String | (read only)   | Service for version calculation
+|*version*          | String | (read only)   | This is the calculated version
+|*previousVersion*  | String | (read only)   | This is the calculated previous version on the branch
+|*branchName*       | String | (read only)   | This is the current branch name
+|*fullbranch*        | Boolean | false        | If this is true, the branch name is used as a part of the version
 |===
 
 ++++
@@ -104,7 +104,7 @@ version = gitflowVersion.version
 
 === Version Calculation - Summary
 * Main Branch (master) +
-The plugin is looking for a tag on the branch with the version prefix. If there is no tag the default value is used and extended with `SNAPSHOT`. If the current commit is without a tag, the first founded tag is used for the calculation and also extended `SNAPSHOT`. When the current commit has a tag with the version extension the version is used from the tag name.
+The plugin searches for a tag on the branch with the version prefix. If there is no tag, the default value is used and extended with `SNAPSHOT`. If the current commit is without a tag, the first found tag is used for the calculation and also extended with `SNAPSHOT`. When the current commit has a tag with the version extension, the version is used from the tag name.
 
 * Developer Branch (develop)
 The version is always 'dev-SNAPSHOT'. No other version information is possible on the branch.
@@ -123,8 +123,8 @@ Example: release/7.11 -> '7.11.0.0-SNAPSHOT' (Version type is 'four')
 |===
 |Task name  |Type             |Description
 
-| showVersion    | ShowVersion    | Shows the current version and the previous version of the current working copy.
-| createChangLog | CreateChangLog | Creates a changelog for the current working copy, starting with the previous version or with the first commit, if there is no previous version.
+| showVersion    | ShowVersion    | Shows the current version and the previous version of the current working copy
+| createChangLog | CreateChangLog | Creates a changelog for the current working copy, starting with the previous version or with the first commit if there is no previous version
 |===
 
 == License
