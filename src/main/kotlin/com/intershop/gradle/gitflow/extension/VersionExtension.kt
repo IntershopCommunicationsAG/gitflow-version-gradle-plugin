@@ -18,6 +18,7 @@ package com.intershop.gradle.gitflow.extension
 import com.intershop.gradle.gitflow.utils.GitVersionService
 import com.intershop.release.version.Version
 import com.intershop.release.version.VersionType
+import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -31,7 +32,8 @@ import javax.inject.Inject
  * @param layout directory layout
  * @param providerFactory provider factory for gradle
  */
-open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
+open class VersionExtension @Inject constructor(project: Project,
+                                                objectFactory: ObjectFactory,
                                                 layout: ProjectLayout,
                                                 val providerFactory: ProviderFactory ) {
 
@@ -54,9 +56,11 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     private val fullbranchProperty = objectFactory.property(Boolean::class.java)
 
     private val versionProperty = objectFactory.property(String::class.java)
+    private val versionWithIDProperty = objectFactory.property(String::class.java)
     private val branchProperty = objectFactory.property(String::class.java)
     private val previousVersionProperty = objectFactory.property(String::class.java)
     private val containerVersionProperty = objectFactory.property(String::class.java)
+
 
     init {
         defaultVersionProperty.convention("1.0.0")
@@ -71,6 +75,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         fullbranchProperty.convention(false)
 
         versionProperty.convention("")
+        versionWithIDProperty.convention("")
         previousVersionProperty.convention("")
         containerVersionProperty.convention("")
         branchProperty.convention("")
@@ -236,10 +241,6 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
             getValueFor("MERGE_BUILD", "mergeBuild", "false")
                 .lowercase(Locale.getDefault()) == "true"
 
-        versionService.isUniqueVersion =
-            getValueFor("UNIQUE_VERSION", "uniqueVersion", "false")
-                .lowercase(Locale.getDefault()) == "true"
-
         versionService.sourceBranch = getValueFor("PR_SOURCE_BRANCH", "sourceBranch", "")
         versionService.pullRequestID = getValueFor("PR_ID", "pullRequestID", "")
 
@@ -286,6 +287,19 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
             containerVersionProperty.set(this.versionService.containerVersion)
         }
         containerVersionProperty.get()
+    }
+
+    val versionWithID: String by lazy {
+        if(versionWithIDProperty.get().isEmpty()) {
+            if(versionService.buildID.isNotEmpty()) {
+                versionWithIDProperty.set(this.versionService.versionWithID)
+            } else {
+                project.logger.quiet("A version with ID is requested, but the Gradle property 'buildID'" +
+                        " or the environment 'BUILD_ID' is not set.")
+                versionWithIDProperty.set(this.versionService.version)
+            }
+        }
+        versionWithIDProperty.get()
     }
 
     /**

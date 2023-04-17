@@ -44,7 +44,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.21.0"
 
     // plugin for publishing to Gradle Portal
-    id("com.gradle.plugin-publish") version "1.0.0"
+    id("com.gradle.plugin-publish") version "1.2.0"
 }
 
 // release configuration
@@ -90,7 +90,7 @@ tasks {
     withType<Test>().configureEach {
         maxParallelForks = 1
 
-        systemProperty("intershop.gradle.versions", "7.2,7.5.1")
+        systemProperty("intershop.gradle.versions", "7.5.1")
         useJUnitPlatform()
     }
 
