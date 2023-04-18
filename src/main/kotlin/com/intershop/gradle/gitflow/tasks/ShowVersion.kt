@@ -45,6 +45,10 @@ open class ShowVersion: DefaultTask() {
             println("-- GitFlow container version is not available!")
         }
 
+        if(versionExt.versionService.buildID.isNotEmpty()) {
+            println("-- Version with ID is")
+            println("--   " + versionExt.versionWithID)
+        }
         if(preVersion.isNotEmpty()) {
             println("-- GitFlow previous version is")
             println("--   " + versionExt.previousVersion)
