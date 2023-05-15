@@ -303,7 +303,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
-    def 'test 06 - release and features, release branch removed'() {
+    def 'test 06 - release and feature, release branch removed'() {
         given:
         TestRepoCreator creator = GitCreatorFourNumbers.initTest6(testProjectDir, "")
 
@@ -344,7 +344,7 @@ class GitIntegrationFourNumbersSpec extends AbstractIntegrationGroovySpec {
         println(" - feature/JIRA-5 -> JIRA-5-SNAPSHOT")
     }
 
-    def 'test 07 - release, hotfix and features'() {
+    def 'test 07 - release, hotfix and feature'() {
         given:
         TestRepoCreator creator = GitCreatorFourNumbers.initTest7(testProjectDir, "")
 

@@ -165,15 +165,15 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release branch release/2.0'
-        creator.setBranch("release/2.0")
+        when: 'on release branch release/11.0'
+        creator.setBranch("release/11.0")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'version is 2.0.0-SNAPSHOT'
-        version == "2.0.0-SNAPSHOT"
-        println(" - release/2.0 -> 2.0.0-SNAPSHOT")
+        then: 'version is 11.0.0-SNAPSHOT'
+        version == "11.0.0-SNAPSHOT"
+        println(" - release/11.0 -> 11.0.0-SNAPSHOT")
         preVersion == null
         println(' - release -> pre version is null')
 
@@ -218,15 +218,15 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release branch release/2.0'
-        creator.setBranch("release/2.0")
+        when: 'on release branch release/11.0'
+        creator.setBranch("release/11.0")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'version is 2.0.0-SNAPSHOT'
-        version == "2.0.0-SNAPSHOT"
-        println(" - release/2.0 -> 2.0.0-SNAPSHOT")
+        then: 'version is 11.0.0-SNAPSHOT'
+        version == "11.0.0-SNAPSHOT"
+        println(" - release/11.0 -> 11.0.0-SNAPSHOT")
         preVersion == null
         println(' - release -> pre version is null')
 
@@ -267,7 +267,7 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
 
         then: 'Version is 1.0.0-SNAPSHOT (default version)'
         version == "1.0.0-SNAPSHOT"
-        println(' - master -> 1.0.0-SNAPSHOT')
+        println(' - master -> 11.0.0-SNAPSHOT')
         preVersion == null
         println(' - master -> pre version is null')
 
@@ -283,15 +283,15 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release branch release/2.0'
-        creator.setBranch("release/2.0")
+        when: 'on release branch release/11.0'
+        creator.setBranch("release/11.0")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'version is 2.0.0-SNAPSHOT'
-        version == "2.0.0-SNAPSHOT"
-        println(" - release/2.0 -> 2.0.0-SNAPSHOT")
+        then: 'version is 11.0.0-SNAPSHOT'
+        version == "11.0.0-SNAPSHOT"
+        println(" - release/11.0 -> 11.0.0-SNAPSHOT")
         preVersion == null
         println(' - release -> pre version is null')
 
@@ -330,9 +330,9 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.0.0'
-        version == "2.0.0"
-        println(' - master -> 2.0.0')
+        then: 'Version is 11.0.0'
+        version == "11.0.0"
+        println(' - master -> 11.0.0')
         preVersion == null
         println(' - master -> pre version is null')
 
@@ -348,15 +348,15 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release branch release/2.0'
-        creator.setBranch("release/2.0")
+        when: 'on release branch release/11.0'
+        creator.setBranch("release/11.0")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'version is 2.0.0-SNAPSHOT'
-        version == "2.0.0-SNAPSHOT"
-        println(" - release/2.0 -> 2.0.0-SNAPSHOT")
+        then: 'version is 11.0.0-SNAPSHOT'
+        version == "11.0.0-SNAPSHOT"
+        println(" - release/11.0 -> 11.0.0-SNAPSHOT")
         preVersion == null
         println(' - develop -> pre version is null')
 
@@ -385,7 +385,7 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         println(' - feature -> pre version is null')
     }
 
-    def 'test 07 - release and features, release branch removed'() {
+    def 'test 07 - release and feature, release branch removed'() {
         given:
         TestRepoCreator creator = GitCreatorThreeNumbers.initTest6(testProjectDir, "")
 
@@ -395,9 +395,9 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.0.0'
-        version == "2.0.0"
-        println(' - master -> 2.0.0')
+        then: 'Version is 11.0.0'
+        version == "11.0.0"
+        println(' - master -> 11.0.0')
         preVersion == null
         println(' - master -> pre version is null')
 
@@ -438,7 +438,7 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         println(' - feature -> pre version is null')
     }
 
-    def 'test 07 - release, hotfix and features'() {
+    def 'test 07 - release, hotfix and feature'() {
         given:
         TestRepoCreator creator = GitCreatorThreeNumbers.initTest7(testProjectDir, "")
 
@@ -448,9 +448,9 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.0.0'
-        version == "2.0.0"
-        println(' - master -> 2.0.0')
+        then: 'Version is 11.0.0'
+        version == "11.0.0"
+        println(' - master -> 11.0.0')
         preVersion == null
         println(' - master -> pre version is null')
 
@@ -513,9 +513,9 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.0.0'
-        version == "2.0.0"
-        println(' - master -> 2.0.0')
+        then: 'Version is 11.0.0'
+        version == "11.0.0"
+        println(' - master -> 11.0.0')
         preVersion == null
         println(' - master -> pre version is null')
 
@@ -531,15 +531,15 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release branch release/2.1'
-        creator.setBranch("release/2.1")
+        when: 'on release branch release/11.1'
+        creator.setBranch("release/11.1")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'version is 2.1.0-SNAPSHOT'
-        version == "2.1.0-SNAPSHOT"
-        println(" - release/2.1 -> 2.1.0-SNAPSHOT")
+        then: 'version is 11.1.0-SNAPSHOT'
+        version == "11.1.0-SNAPSHOT"
+        println(" - release/11.1 -> 11.1.0-SNAPSHOT")
         preVersion == null
         println(' - release -> pre version is null')
 
@@ -578,11 +578,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.0.1'
-        version == "2.0.1"
-        println(' - master -> 2.0.1')
-        preVersion == "2.0.0"
-        println(' - master -> pre version is 2.0.0')
+        then: 'Version is 11.0.1'
+        version == "11.0.1"
+        println(' - master -> 11.0.1')
+        preVersion == "11.0.0"
+        println(' - master -> pre version is 11.0.0')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -596,15 +596,15 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release branch release/2.1'
-        creator.setBranch("release/2.1")
+        when: 'on release branch release/11.1'
+        creator.setBranch("release/11.1")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'version is 2.1.0-SNAPSHOT'
-        version == "2.1.0-SNAPSHOT"
-        println(" - release/2.1 -> 2.1.0-SNAPSHOT")
+        then: 'version is 11.1.0-SNAPSHOT'
+        version == "11.1.0-SNAPSHOT"
+        println(" - release/11.1 -> 11.1.0-SNAPSHOT")
         preVersion == null
         println(' - release -> pre version is null')
 
@@ -631,11 +631,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.0.1'
-        version == "2.0.1"
-        println(' - master -> 2.0.1')
-        preVersion == "2.0.0"
-        println(' - master -> pre version is 2.0.0')
+        then: 'Version is 11.0.1'
+        version == "11.0.1"
+        println(' - master -> 11.0.1')
+        preVersion == "11.0.0"
+        println(' - master -> pre version is 11.0.0')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -649,16 +649,16 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release branch release/2.1'
-        creator.setBranch("release/2.1")
+        when: 'on release branch release/11.1'
+        creator.setBranch("release/11.1")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'version is 2.1.0-SNAPSHOT'
-        version == "2.1.0-SNAPSHOT"
-        println(" - release/2.1 -> 2.1.0-SNAPSHOT")
-        preVersion == "2.0.1"
+        then: 'version is 11.1.0-SNAPSHOT'
+        version == "11.1.0-SNAPSHOT"
+        println(" - release/11.1 -> 11.1.0-SNAPSHOT")
+        preVersion == "11.0.1"
         println(' - release -> pre version is 2.0.1')
 
         when: 'on feature branch feature/JIRA-5'
@@ -684,11 +684,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.0-SNAPSHOT'
-        version == "2.1.0-SNAPSHOT"
-        println(' - master -> 2.1.0-SNAPSHOT')
-        preVersion == "2.0.1"
-        println(' - master -> pre version is 2.0.1')
+        then: 'Version is 11.1.0-SNAPSHOT'
+        version == "11.1.0-SNAPSHOT"
+        println(' - master -> 11.1.0-SNAPSHOT')
+        preVersion == "11.0.1"
+        println(' - master -> pre version is 11.0.1')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -711,11 +711,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.0'
-        version == "2.1.0"
-        println(' - master -> 2.1.0')
-        preVersion == "2.0.1"
-        println(' - master -> pre version is 2.0.1')
+        then: 'Version is 11.1.0'
+        version == "11.1.0"
+        println(' - master -> 11.1.0')
+        preVersion == "11.0.1"
+        println(' - master -> pre version is 11.0.1')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -740,11 +740,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.0'
-        version == "2.1.0"
-        println(' - master -> 2.1.0')
-        preVersion == "2.0.1"
-        println(' - master -> pre version is 2.0.1')
+        then: 'Version is 11.1.0'
+        version == "11.1.0"
+        println(' - master -> 11.1.0')
+        preVersion == "11.0.1"
+        println(' - master -> pre version is 11.0.1')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -758,29 +758,29 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release/2'
-        creator.setBranch("release/2")
+        when: 'on support/11'
+        creator.setBranch("support/11")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.0'
-        version == "2.1.0"
-        println(' - on release/2 -> 2.1.0')
-        preVersion == "2.0.1"
-        println(' - release -> pre version is 2.0.1')
+        then: 'Version is 11.1.0'
+        version == "11.1.0"
+        println(' - on release/11 -> 11.1.0')
+        preVersion == "11.0.1"
+        println(' - release -> pre version is 11.0.1')
 
-        when: 'on release/3.0'
-        creator.setBranch("release/3.0")
+        when: 'on release/12.0'
+        creator.setBranch("release/12.0")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 3.0.0-SNAPSHOT'
-        version == "3.0.0-SNAPSHOT"
-        println(' - release -> 3.0.0-SNAPSHOT')
-        preVersion == "2.0.1"
-        println(' - master -> pre version is 2.0.1')
+        then: 'Version is 12.0.0-SNAPSHOT'
+        version == "12.0.0-SNAPSHOT"
+        println(' - release -> 12.0.0-SNAPSHOT')
+        preVersion == "11.0.1"
+        println(' - master -> pre version is 11.0.1')
     }
 
     def 'test 14 - two release branches and one hotfix branch'() {
@@ -793,11 +793,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.0'
-        version == "2.1.0"
-        println(' - master -> 2.1.0')
-        preVersion == "2.0.1"
-        println(' - master -> pre version is 2.0.1')
+        then: 'Version is 11.1.0'
+        version == "11.1.0"
+        println(' - master -> 11.1.0')
+        preVersion == "11.0.1"
+        println(' - master -> pre version is 11.0.1')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -811,29 +811,29 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release/2'
-        creator.setBranch("release/2")
+        when: 'on release/11'
+        creator.setBranch("support/11")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.1-SNAPSHOT'
-        version == "2.1.1-SNAPSHOT"
-        println(' - on release/2 -> 2.1.1-SNAPSHOT')
-        preVersion == "2.1.0"
-        println(' - release -> pre version is 2.1.0')
+        then: 'Version is 11.1.1-SNAPSHOT'
+        version == "11.1.1-SNAPSHOT"
+        println(' - on release/11 -> 11.1.1-SNAPSHOT')
+        preVersion == "11.1.0"
+        println(' - release -> pre version is 11.1.0')
 
-        when: 'on release/3'
-        creator.setBranch("release/3.0")
+        when: 'on release/12'
+        creator.setBranch("release/12.0")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 3.0.0-SNAPSHOT'
-        version == "3.0.0-SNAPSHOT"
-        println(' - release -> 3.0.0-SNAPSHOT')
-        preVersion == "2.0.1"
-        println(' - master -> pre version is 2.0.1')
+        then: 'Version is 12.0.0-SNAPSHOT'
+        version == "12.0.0-SNAPSHOT"
+        println(' - release -> 12.0.0-SNAPSHOT')
+        preVersion == "11.0.1"
+        println(' - master -> pre version is 11.0.1')
 
         when: 'on feature branch hotfix/JIRA-7'
         creator.setBranch("hotfix/JIRA-7")
@@ -858,11 +858,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 3.0.0'
-        version == "3.0.0"
-        println(' - master -> 3.0.0')
-        preVersion == "2.1.0"
-        println(' - master -> pre version is 2.1.0')
+        then: 'Version is 12.0.0'
+        version == "12.0.0"
+        println(' - master -> 12.0.0')
+        preVersion == "11.1.0"
+        println(' - master -> pre version is 11.1.0')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -876,17 +876,17 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release/2'
-        creator.setBranch("release/2")
+        when: 'on support/11'
+        creator.setBranch("support/11")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.1-SNAPSHOT'
-        version == "2.1.1-SNAPSHOT"
-        println(' - on release/2 -> 2.1.1-SNAPSHOT')
-        preVersion == "2.1.0"
-        println(' - release -> pre version is 2.1.0')
+        then: 'Version is 11.1.1-SNAPSHOT'
+        version == "11.1.1-SNAPSHOT"
+        println(' - on release/11 -> 11.1.1-SNAPSHOT')
+        preVersion == "11.1.0"
+        println(' - release -> pre version is 11.1.0')
 
         when: 'on feature branch hotfix/JIRA-7'
         creator.setBranch("hotfix/JIRA-7")
@@ -911,11 +911,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 3.0.0'
-        version == "3.0.0"
-        println(' - master -> 3.0.0')
-        preVersion == "2.1.0"
-        println(' - master -> pre version is 2.1.0')
+        then: 'Version is 12.0.0'
+        version == "12.0.0"
+        println(' - master -> 12.0.0')
+        preVersion == "11.1.0"
+        println(' - master -> pre version is 11.1.0')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -929,20 +929,20 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release/2'
-        creator.setBranch("release/2")
+        when: 'on support/11'
+        creator.setBranch("support/11")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.1-SNAPSHOT'
-        version == "2.1.1-SNAPSHOT"
-        println(' - on release/2 -> 2.1.1-SNAPSHOT')
-        preVersion == "2.1.0"
-        println(' - release -> pre version is 2.1.0')
+        then: 'Version is 11.1.1-SNAPSHOT'
+        version == "11.1.1-SNAPSHOT"
+        println(' - on release/11 -> 11.1.1-SNAPSHOT')
+        preVersion == "11.1.0"
+        println(' - release -> pre version is 11.1.0')
     }
 
-    def 'test 17 - two "master branches"'() {
+    def 'test 17 - one master and one support branch'() {
         given:
         TestRepoCreator creator = GitCreatorThreeNumbers.initTest17(testProjectDir, "")
 
@@ -952,11 +952,11 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String version = gvs.version
         String preVersion = gvs.previousVersion
 
-        then: 'Version is 3.0.1-SNAPSHOT'
-        version == "3.0.1-SNAPSHOT"
-        println(' - master -> 3.0.1-SNAPSHOT')
-        preVersion == "3.0.0"
-        println(' - master -> pre version is 3.0.0')
+        then: 'Version is 12.0.1-SNAPSHOT'
+        version == "12.0.0"
+        println(' - master -> 12.0.0')
+        preVersion == "11.1.0"
+        println(' - master -> pre version is 11.1.0')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -970,17 +970,17 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release/2'
-        creator.setBranch("release/2")
+        when: 'on support/11'
+        creator.setBranch("support/11")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.1'
-        version == "2.1.1"
-        println(' - on release/2 -> 2.1.1')
-        preVersion == "2.1.0"
-        println(' - release -> pre version is 2.1.0')
+        then: 'Version is 11.1.1'
+        version == "11.1.1"
+        println(' - on release/11 -> 11.1.1')
+        preVersion == "11.1.0"
+        println(' - release -> pre version is 11.1.0')
     }
 
     def 'test 18 - two "master branches" - hotfix merged in 2'() {
@@ -994,10 +994,10 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         String preVersion = gvs.previousVersion
 
         then:
-        version == "3.0.1-SNAPSHOT"
-        println(' - master -> 3.0.1-SNAPSHOT')
-        preVersion == "3.0.0"
-        println(' - master -> pre version is 3.0.0')
+        version == "12.0.0"
+        println(' - master without changes')
+        preVersion == "11.1.0"
+        println(' - master -> pre version is 11.1.0')
 
         when: 'on develop branch'
         creator.setBranch("develop")
@@ -1011,16 +1011,16 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
-        when: 'on release/2'
-        creator.setBranch("release/2")
+        when: 'on support/11'
+        creator.setBranch("support/11")
         gvs = getConfGitVersionService(creator.directory)
         version = gvs.version
         preVersion = gvs.previousVersion
 
-        then: 'Version is 2.1.2-SNAPSHOT'
-        version == "2.1.2-SNAPSHOT"
-        println(' - release/2 -> 2.1.2-SNAPSHOT')
-        preVersion == "2.1.1"
-        println(' - release -> pre version is 2.1.1')
+        then: 'Version is 11.1.2-SNAPSHOT'
+        version == "11.1.2-SNAPSHOT"
+        println(' - support/11 -> 11.1.2-SNAPSHOT')
+        preVersion == "11.1.1"
+        println(' - release -> pre version is 11.1.1')
     }
 }
