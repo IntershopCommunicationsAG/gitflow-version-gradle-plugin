@@ -44,13 +44,15 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.21.0"
 
     // plugin for publishing to Gradle Portal
-    id("com.gradle.plugin-publish") version "1.0.0"
+
+    id("com.gradle.plugin-publish") version "1.2.0"
 }
 
 // release configuration
 group = "com.intershop.gradle.version"
 description = "Gradle SCM version plugin - SCM based version handling for Gradle"
-version = "1.7.5"
+version = "1.8.0"
+
 
 val sonatypeUsername: String by project
 val sonatypePassword: String? by project
@@ -89,8 +91,7 @@ detekt {
 tasks {
     withType<Test>().configureEach {
         maxParallelForks = 1
-
-        systemProperty("intershop.gradle.versions", "7.2,7.5.1")
+        systemProperty("intershop.gradle.versions", "7.5.1")
         useJUnitPlatform()
     }
 

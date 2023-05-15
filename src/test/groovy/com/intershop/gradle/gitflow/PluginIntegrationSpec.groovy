@@ -465,7 +465,6 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         then:
         result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
         result1.output.contains("2.0.0-id456789-SNAPSHOT")
-        result1.output.contains("2.0.0-id456789-latest")
 
         when:
         creator.setBranch("hotfix/team1/12345-message")
@@ -527,7 +526,6 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         then:
         result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
         result1.output.contains("2.0.0-id963258-SNAPSHOT")
-        result1.output.contains("2.0.0-id963258-latest")
 
         when:
         creator.setBranch("hotfix/team1/12345-message")

@@ -172,12 +172,6 @@ class GitVersionService @JvmOverloads constructor(
      */
     var isMergeBuild: Boolean = false
 
-    /**
-     * This must be set to true, if the Container version must be always unique.
-     * Therefore the following environment variables must be set: uniqueContainer, buildID
-     */
-    var isUniqueVersion: Boolean = false
-
     private val changed: Boolean by lazy {
         val status = client.status().call()
         val rv = status.untracked.size > 0 || status.uncommittedChanges.size > 0 ||
@@ -210,34 +204,31 @@ class GitVersionService @JvmOverloads constructor(
         rv
     }
 
-    private fun versionFromMainBranch(isContainer: Boolean) : String {
+    private fun versionFromMainBranch(isContainer: Boolean, uniqueID: String) : String {
         val vm = getLatestVersion()
         val addMetaData = versionForLocalChanges("", "local")
 
-        val uniqueID = if(isUniqueVersion) "id${buildID}-" else ""
+        val idStr = if(uniqueID.isNotEmpty()) "id${uniqueID}-" else ""
 
         return when {
             vm == defaultVersion && addMetaData.isEmpty() && !isContainer ->
-                vm.setBuildMetadata("${uniqueID}SNAPSHOT").toString()
+                vm.setBuildMetadata("${idStr}SNAPSHOT").toString()
             vm == defaultVersion && addMetaData.isEmpty() && isContainer ->
-                vm.setBuildMetadata("${uniqueID}latest").toString()
+                vm.setBuildMetadata("${idStr}latest").toString()
             addMetaData.isNotBlank() && !isContainer ->
-                vm.setBranchMetadata(addMetaData).setBuildMetadata("${uniqueID}SNAPSHOT").toString()
+                vm.setBranchMetadata(addMetaData).setBuildMetadata("${idStr}SNAPSHOT").toString()
             addMetaData.isNotBlank() && isContainer ->
-                vm.setBranchMetadata(addMetaData).setBuildMetadata("${uniqueID}latest").toString()
+                vm.setBranchMetadata(addMetaData).setBuildMetadata("${idStr}latest").toString()
 
             else -> vm.toString()
         }
     }
 
-    private fun versionForMergeBranch(isContainer: Boolean): String {
+    private fun versionForMergeBranch(): String {
         if (sourceBranch.isEmpty() && pullRequestID.isEmpty()) {
             log.error("The source branch or the pull request ID is not specified," +
                        "but necessary because this should be a version for a pull request.")
             throw GradleException("Missing environment variables for pull request - source branch and ID")
-        }
-        if (buildID.isEmpty()) {
-            log.warn("The build ID is not specified for the version calculation for a pull request")
         }
         val mBranchName = if (sourceBranch.startsWith(headsPrefix)) {
             sourceBranch.substring(headsPrefix.length)
@@ -265,20 +256,11 @@ class GitVersionService @JvmOverloads constructor(
             }
         }
 
-        return if(isContainer) {
-                    "${bBranchName}-pr${pullRequestID}-id${buildID}-latest"
-                } else {
-                    "${bBranchName}-pr${pullRequestID}-id${buildID}-SNAPSHOT"
-                }
+        return "${bBranchName}-pr${pullRequestID}"
     }
 
-    private fun versionFromDevBranch(isContainer: Boolean) : String {
-        val uniqueID = if(isUniqueVersion) "-id${buildID}" else ""
-        return if(isContainer) {
-            "${versionForLocalChanges("dev", "local-dev")}${uniqueID}-latest"
-        } else {
-            "${versionForLocalChanges("dev", "local-dev")}${uniqueID}-SNAPSHOT"
-        }
+    private fun versionFromDevBranch() : String {
+        return versionForLocalChanges("dev", "local-dev")
     }
 
     private fun versionFromHotfix(isContainer: Boolean) : String {
@@ -340,6 +322,58 @@ class GitVersionService @JvmOverloads constructor(
 
     /**
      * This is the calculated version of the Git repository.
+     * If a buildID is specified for special branches a build id is added.
+     */
+
+    val versionWithID: String by lazy {
+        val tag = getVersionTagFrom(Constants.HEAD)
+        var rv: String
+
+
+        if(! localOnly) {
+            when {
+                isMergeBuild -> {
+                    rv = "${versionForMergeBranch()}-id${buildID}-SNAPSHOT"
+                }
+                tag.isNotBlank() -> {
+                    rv = versionForLocalChanges(tag, "${tag}-local-SNAPSHOT")
+                }
+                branch == mainBranch -> {
+                    rv = versionFromMainBranch(false, buildID)
+                }
+                branch == developBranch -> {
+                    rv = "${versionFromDevBranch()}-id${buildID}-SNAPSHOT"
+                }
+                branch.startsWith("${hotfixPrefix}${separator}") -> {
+                    rv = versionFromHotfix(false)
+                }
+                branch.startsWith("${featurePrefix}${separator}") -> {
+                    rv = versionFromFeature(false)
+                }
+                branch.startsWith("${releasePrefix}${separator}") -> {
+                    rv = versionFromRelease(false)
+                }
+                else -> {
+                    val branches = getBranchListForRef()
+                    rv = when {
+                        branches.contains(mainBranch) -> versionFromMainBranch(false, buildID)
+                        branches.contains(developBranch) -> "${versionFromDevBranch()}-id${buildID}-SNAPSHOT"
+                        branches.contains(releasePrefix) -> {
+                            val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
+                            getBranchNameForVersion(releasePrefix, bn)
+                        }
+                        else -> "version-id${buildID}-SNAPSHOT"
+                    }
+                }
+            }
+        } else {
+            rv = "LOCAL"
+        }
+        rv
+    }
+
+    /**
+     * This is the calculated version of the Git repository.
      */
     val version: String by lazy {
 
@@ -349,16 +383,16 @@ class GitVersionService @JvmOverloads constructor(
         if(! localOnly) {
             when {
                 isMergeBuild -> {
-                    rv = versionForMergeBranch(false)
+                    rv = "${versionForMergeBranch()}-SNAPSHOT"
                 }
                 tag.isNotBlank() -> {
                     rv = versionForLocalChanges(tag, "${tag}-local-SNAPSHOT")
                 }
                 branch == mainBranch -> {
-                    rv = versionFromMainBranch(false)
+                    rv = versionFromMainBranch(false,"")
                 }
                 branch == developBranch -> {
-                    rv = versionFromDevBranch(false)
+                    rv = "${versionFromDevBranch()}-SNAPSHOT"
                 }
                 branch.startsWith("${supportPrefix}${separator}") -> {
                     rv = versionFromSupport(false)
@@ -367,7 +401,6 @@ class GitVersionService @JvmOverloads constructor(
                     rv = versionFromHotfix(false)
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
-                    // version = feature/local-'branchname'-SNAPSHOT
                     rv = versionFromFeature(false)
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
@@ -376,8 +409,8 @@ class GitVersionService @JvmOverloads constructor(
                 else -> {
                     val branches = getBranchListForRef()
                     rv = when {
-                        branches.contains(mainBranch) -> versionFromMainBranch(false)
-                        branches.contains(developBranch) -> versionFromDevBranch(false)
+                        branches.contains(mainBranch) -> versionFromMainBranch(false, "")
+                        branches.contains(developBranch) -> "${versionFromDevBranch()}-SNAPSHOT"
                         branches.contains(releasePrefix) -> {
                             val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)
@@ -402,16 +435,16 @@ class GitVersionService @JvmOverloads constructor(
         if(! localOnly) {
             when {
                 isMergeBuild -> {
-                    rv = versionForMergeBranch(true)
+                    rv = "${versionForMergeBranch()}-latest"
                 }
                 tag.isNotBlank() -> {
                     rv = versionForLocalChanges(tag, "${tag}-local")
                 }
                 branch == mainBranch -> {
-                    rv = versionFromMainBranch(true)
+                    rv = versionFromMainBranch(true, "")
                 }
                 branch == developBranch -> {
-                    rv = versionFromDevBranch(true)
+                    rv = "${versionFromDevBranch()}-latest"
                 }
                 branch.startsWith("${supportPrefix}${separator}") -> {
                     rv = versionFromSupport(true)
@@ -420,7 +453,6 @@ class GitVersionService @JvmOverloads constructor(
                     rv = versionFromHotfix(true)
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
-                    // version = feature/local-'branchname'-SNAPSHOT
                     rv = versionFromFeature(true)
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
@@ -429,8 +461,8 @@ class GitVersionService @JvmOverloads constructor(
                 else -> {
                     val branches = getBranchListForRef()
                     rv = when {
-                        branches.contains(mainBranch) -> versionFromMainBranch(true)
-                        branches.contains(developBranch) -> versionFromDevBranch(true)
+                        branches.contains(mainBranch) -> versionFromMainBranch(true, "")
+                        branches.contains(developBranch) -> "${versionFromDevBranch()}-latest"
                         branches.contains(releasePrefix) -> {
                             val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)
