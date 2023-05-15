@@ -236,8 +236,6 @@ class GitVersionService @JvmOverloads constructor(
             sourceBranch
         }
 
-        println("--b-- ${mBranchName} -- ${sourceBranch} -- ")
-
         val bBranchName = when {
             mBranchName.startsWith(featurePrefix) -> {
                 getBranchNameForVersion(featurePrefix, mBranchName)
@@ -318,58 +316,6 @@ class GitVersionService @JvmOverloads constructor(
                 vb.toString()
             }
         }
-    }
-
-    /**
-     * This is the calculated version of the Git repository.
-     * If a buildID is specified for special branches a build id is added.
-     */
-
-    val versionWithID: String by lazy {
-        val tag = getVersionTagFrom(Constants.HEAD)
-        var rv: String
-
-
-        if(! localOnly) {
-            when {
-                isMergeBuild -> {
-                    rv = "${versionForMergeBranch()}-id${buildID}-SNAPSHOT"
-                }
-                tag.isNotBlank() -> {
-                    rv = versionForLocalChanges(tag, "${tag}-local-SNAPSHOT")
-                }
-                branch == mainBranch -> {
-                    rv = versionFromMainBranch(false, buildID)
-                }
-                branch == developBranch -> {
-                    rv = "${versionFromDevBranch()}-id${buildID}-SNAPSHOT"
-                }
-                branch.startsWith("${hotfixPrefix}${separator}") -> {
-                    rv = versionFromHotfix(false)
-                }
-                branch.startsWith("${featurePrefix}${separator}") -> {
-                    rv = versionFromFeature(false)
-                }
-                branch.startsWith("${releasePrefix}${separator}") -> {
-                    rv = versionFromRelease(false)
-                }
-                else -> {
-                    val branches = getBranchListForRef()
-                    rv = when {
-                        branches.contains(mainBranch) -> versionFromMainBranch(false, buildID)
-                        branches.contains(developBranch) -> "${versionFromDevBranch()}-id${buildID}-SNAPSHOT"
-                        branches.contains(releasePrefix) -> {
-                            val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
-                            getBranchNameForVersion(releasePrefix, bn)
-                        }
-                        else -> "version-id${buildID}-SNAPSHOT"
-                    }
-                }
-            }
-        } else {
-            rv = "LOCAL"
-        }
-        rv
     }
 
     /**
@@ -595,8 +541,6 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun getBranchNameForVersion(prefix: String, branchName: String): String {
-
-        println("----- ${prefix} - and - ${branchName}")
 
         val bname = branchName.substring("${prefix}${separator}".length)
         val sname = bname.split("/".toRegex(), 2)
