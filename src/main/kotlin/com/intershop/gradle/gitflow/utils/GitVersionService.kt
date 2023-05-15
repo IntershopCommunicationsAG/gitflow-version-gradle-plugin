@@ -114,6 +114,12 @@ class GitVersionService @JvmOverloads constructor(
     var releasePrefix: String = "release"
 
     /**
+     * Prefix of a support branch.
+     * Default value is support.
+     */
+    var supportPrefix: String = "support"
+
+    /**
      * Prefix of a version tag.
      * Default value is version.
      */
@@ -132,7 +138,7 @@ class GitVersionService @JvmOverloads constructor(
 
     /**
      * Version is shortened for branches and hotfixes
-     * with an hash for the string if shortened is true.
+     * with a hash for the string if shortened is true.
      */
     var fullbranch: Boolean = false
 
@@ -239,6 +245,8 @@ class GitVersionService @JvmOverloads constructor(
             sourceBranch
         }
 
+        println("--b-- ${mBranchName} -- ${sourceBranch} -- ")
+
         val bBranchName = when {
             mBranchName.startsWith(featurePrefix) -> {
                 getBranchNameForVersion(featurePrefix, mBranchName)
@@ -308,6 +316,28 @@ class GitVersionService @JvmOverloads constructor(
         }
     }
 
+    private fun versionFromSupport(isContainer: Boolean) : String {
+        // version = 'branchname'-SNAPSHOT or increased version from tag ...
+        val vb = getLatestVersion()
+        return if (vb == defaultVersion) {
+            val branchName = getBranchNameForVersion(supportPrefix, branch)
+            val vrb = Version.forString(branchName, versionType)
+            val v = versionForLocalChanges("${vrb}", "${vrb}-local")
+            if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
+        } else {
+            val addMetaData = versionForLocalChanges("", "local")
+            if (addMetaData.isNotBlank()) {
+                if(isContainer) {
+                    vb.setBranchMetadata("${addMetaData}-latest").toString()
+                } else {
+                    vb.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
+                }
+            } else {
+                vb.toString()
+            }
+        }
+    }
+
     /**
      * This is the calculated version of the Git repository.
      */
@@ -329,6 +359,9 @@ class GitVersionService @JvmOverloads constructor(
                 }
                 branch == developBranch -> {
                     rv = versionFromDevBranch(false)
+                }
+                branch.startsWith("${supportPrefix}${separator}") -> {
+                    rv = versionFromSupport(false)
                 }
                 branch.startsWith("${hotfixPrefix}${separator}") -> {
                     rv = versionFromHotfix(false)
@@ -379,6 +412,9 @@ class GitVersionService @JvmOverloads constructor(
                 }
                 branch == developBranch -> {
                     rv = versionFromDevBranch(true)
+                }
+                branch.startsWith("${supportPrefix}${separator}") -> {
+                    rv = versionFromSupport(true)
                 }
                 branch.startsWith("${hotfixPrefix}${separator}") -> {
                     rv = versionFromHotfix(true)
@@ -448,7 +484,7 @@ class GitVersionService @JvmOverloads constructor(
     /**
      * Calculates the commit for a specified version.
      *
-     * @param version is the a version
+     * @param version is version tag
      */
     fun getRevObjectFrom(version: Version) : RevCommit? {
         val tags: MutableMap<ObjectId, List<Ref>> = getMapFrom(Constants.R_TAGS)
@@ -475,6 +511,9 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun getBranchNameForVersion(prefix: String, branchName: String): String {
+
+        println("----- ${prefix} - and - ${branchName}")
+
         val bname = branchName.substring("${prefix}${separator}".length)
         val sname = bname.split("/".toRegex(), 2)
         val fname = if(sname.size > 1) {

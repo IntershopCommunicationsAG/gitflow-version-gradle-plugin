@@ -48,6 +48,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
     private val hotfixPrefixProperty = objectFactory.property(String::class.java)
     private val featurePrefixProperty = objectFactory.property(String::class.java)
     private val releasePrefixProperty = objectFactory.property(String::class.java)
+    private val supportPrefixProperty = objectFactory.property(String::class.java)
     private val versionPrefixProperty = objectFactory.property(String::class.java)
     private val separatorProperty = objectFactory.property(String::class.java)
     private val versionTypeProperty = objectFactory.property(String::class.java)
@@ -65,6 +66,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         hotfixPrefixProperty.convention("hotfix")
         featurePrefixProperty.convention("feature")
         releasePrefixProperty.convention("release")
+        supportPrefixProperty.convention("support")
         versionPrefixProperty.convention("version")
         separatorProperty.convention("/")
         versionTypeProperty.convention("three")
@@ -155,6 +157,19 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         set(value) = releasePrefixProperty.set(value)
 
     /**
+     * This is provider for the releasePrefix property.
+     */
+    val supportPrefixProvider: Provider<String>
+        get() = supportPrefixProperty
+
+    /**
+     * This is releasePrefix property.
+     */
+    var supportPrefix : String
+        get() = supportPrefixProperty.get()
+        set(value) = supportPrefixProperty.set(value)
+
+    /**
      * This is provider for the versionPrefix property.
      */
     val versionPrefixProvider: Provider<String>
@@ -224,6 +239,7 @@ open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
         versionService.featurePrefix = featurePrefixProperty.get()
         versionService.hotfixPrefix = hotfixPrefixProperty.get()
         versionService.releasePrefix = releasePrefixProperty.get()
+        versionService.supportPrefix = supportPrefixProperty.get()
         versionService.versionPrefix = versionPrefixProperty.get()
         versionService.separator = separatorProperty.get()
         versionService.fullbranch = fullbranchProperty.get()

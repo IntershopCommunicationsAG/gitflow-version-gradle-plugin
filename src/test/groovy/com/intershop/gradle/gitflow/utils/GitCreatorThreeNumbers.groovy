@@ -63,7 +63,7 @@ class GitCreatorThreeNumbers {
         def cFeature2 = creator.merge("develop", "feature/JIRA-2", "feature JIRA-2 merge")
 
         creator.setBranch("develop")
-        creator.createBranch("release/2.0", cFeature2)
+        creator.createBranch("release/11.0", cFeature2)
 
         return creator
     }
@@ -74,7 +74,7 @@ class GitCreatorThreeNumbers {
         creator.setBranch("develop")
         creator.createCommits("develop2", 1)
 
-        creator.setBranch("release/2.0")
+        creator.setBranch("release/11.0")
         def cRelease = creator.createCommits("release200", 2)
 
         creator.createBranch("hotfix/JIRA-4", cRelease)
@@ -93,7 +93,7 @@ class GitCreatorThreeNumbers {
         creator.setBranch("feature/JIRA-5")
         creator.createCommits("jira5", 2)
 
-        creator.merge("release/2.0", "hotfix/JIRA-4", "merge hotfix to release 711")
+        creator.merge("release/11.0", "hotfix/JIRA-4", "merge hotfix to release 11")
 
         return creator
     }
@@ -101,9 +101,9 @@ class GitCreatorThreeNumbers {
     static TestRepoCreator initTest5(File dir, String buildFileContent) {
         TestRepoCreator creator = initTest4(dir, buildFileContent)
 
-        creator.merge("develop", "release/2.0", "merge release 20 to develop")
-        def cRelease711M = creator.merge("master", "release/2.0", "merge release 20 to master")
-        creator.createTag("version/2.0.0", "create release tag", cRelease711M)
+        creator.merge("develop", "release/11.0", "merge release 20 to develop")
+        def cRelease711M = creator.merge("master", "release/11.0", "merge release 11.0 to master")
+        creator.createTag("version/11.0.0", "create release tag", cRelease711M)
 
         return creator
     }
@@ -111,7 +111,7 @@ class GitCreatorThreeNumbers {
     static TestRepoCreator initTest6(File dir, String buildFileContent) {
         TestRepoCreator creator = initTest5(dir, buildFileContent)
 
-        creator.removeBranch("release/2.0")
+        creator.removeBranch("release/11.0")
 
         return creator
     }
@@ -140,8 +140,8 @@ class GitCreatorThreeNumbers {
         creator.createCommits("jira32", 2)
         def cFeature3 = creator.merge("develop", "feature/JIRA-3", "feature JIRA-3 merge")
 
-        creator.createBranch("release/2.1", cFeature3)
-        creator.setBranch("release/2.1")
+        creator.createBranch("release/11.1", cFeature3)
+        creator.setBranch("release/11.1")
         creator.createCommits("release2", 1)
 
         creator.setBranch("hotfix/JIRA-6")
@@ -156,7 +156,7 @@ class GitCreatorThreeNumbers {
         def cHotfix6 = creator.merge("master", "hotfix/JIRA-6",  "merge hotfix JIRA6 to master")
         creator.merge("develop", "hotfix/JIRA-6",  "merge hotfix JIRA6 to master")
         creator.setBranch("master")
-        creator.createTag("version/2.0.1", "create release tag", cHotfix6)
+        creator.createTag("version/11.0.1", "create release tag", cHotfix6)
 
         return creator
     }
@@ -165,7 +165,7 @@ class GitCreatorThreeNumbers {
         TestRepoCreator creator = initTest9(dir, buildFileContent)
 
         creator.merge("develop", "master",  "merge release 21 hotfix 6 to develop")
-        creator.merge("release/2.1", "master",  "merge release 21 hotfix 6 to develop")
+        creator.merge("release/11.1", "master",  "merge release 21 hotfix 6 to develop")
 
         return creator
     }
@@ -176,13 +176,13 @@ class GitCreatorThreeNumbers {
         creator.setBranch("develop")
         creator.createCommits("develop5", 2)
 
-        creator.setBranch("release/2.1")
+        creator.setBranch("release/11.1")
         creator.createCommits("release21", 2)
 
         creator.setBranch("develop")
         creator.createCommits("release22", 1)
 
-        creator.merge("master", "release/2.1", "merge release 21 to master")
+        creator.merge("master", "release/11.1", "merge release 21 to master")
 
         return creator
     }
@@ -190,11 +190,11 @@ class GitCreatorThreeNumbers {
     static TestRepoCreator initTest12(File dir, String buildFileContent) {
         TestRepoCreator creator = initTest11(dir, buildFileContent)
 
-        creator.merge("develop", "release/2.1",  "merge release 21 to develop")
-        creator.removeBranch("release/2.1")
+        creator.merge("develop", "release/11.1",  "merge release 21 to develop")
+        creator.removeBranch("release/11.1")
 
         creator.setBranch("master")
-        creator.createTag("version/2.1.0", "create release tag", Constants.HEAD)
+        creator.createTag("version/11.1.0", "create release tag", Constants.HEAD)
 
         return creator
     }
@@ -207,10 +207,10 @@ class GitCreatorThreeNumbers {
         def cFeature5 = creator.merge("develop", "feature/JIRA-5",  "merge feature JIRA5 to develop")
 
         creator.setBranch("master")
-        creator.createBranch("release/2", Constants.HEAD)
+        creator.createBranch("support/11", Constants.HEAD)
 
         creator.setBranch("develop")
-        creator.createBranch("release/3.0", cFeature5)
+        creator.createBranch("release/12.0", cFeature5)
         creator.createCommits("release30", 2)
 
         return creator
@@ -219,14 +219,14 @@ class GitCreatorThreeNumbers {
     static TestRepoCreator initTest14(File dir, String buildFileContent) {
         TestRepoCreator creator = initTest13(dir, buildFileContent)
 
-        creator.setBranch("release/2")
+        creator.setBranch("support/11")
         def cRelease1 = creator.createCommits("release4", 2)
 
         creator.createBranch("hotfix/JIRA-7", cRelease1)
         creator.setBranch("hotfix/JIRA-7")
         creator.createCommits("jira7", 2)
 
-        creator.setBranch("release/3.0")
+        creator.setBranch("release/12.0")
         creator.createCommits("release31", 2)
 
         return creator
@@ -235,13 +235,13 @@ class GitCreatorThreeNumbers {
     static TestRepoCreator initTest15(File dir, String buildFileContent) {
         TestRepoCreator creator = initTest14(dir, buildFileContent)
 
-        def cRelease3 = creator.merge("master", "release/3.0", "merge release 3 to master")
-        creator.merge("develop", "release/3.0",  "merge release 3 to develop")
+        def cRelease3 = creator.merge("master", "release/12.0", "merge release 3 to master")
+        creator.merge("develop", "release/12.0",  "merge release 3 to develop")
 
-        creator.removeBranch("release/3.0")
+        creator.removeBranch("release/12.0")
 
         creator.setBranch("master")
-        creator.createTag("version/3.0.0", "create release tag", cRelease3)
+        creator.createTag("version/12.0.0", "create release tag", cRelease3)
 
         return creator
     }
@@ -252,7 +252,7 @@ class GitCreatorThreeNumbers {
         creator.setBranch("hotfix/JIRA-7")
         creator.createCommits("jira71", 2)
 
-        creator.merge("release/2", "hotfix/JIRA-7",  "merge hotfix to release")
+        creator.merge("support/11", "hotfix/JIRA-7",  "merge hotfix to support")
 
         return creator
     }
@@ -260,12 +260,9 @@ class GitCreatorThreeNumbers {
     static TestRepoCreator initTest17(File dir, String buildFileContent) {
         TestRepoCreator creator = initTest16(dir, buildFileContent)
 
-        creator.merge("master", "release/2", "merge release 2 to master")
-        creator.merge("develop", "release/2",  "merge release 2 to develop")
-
-        creator.setBranch("release/2")
+        creator.setBranch("support/11")
         def cRelease4 = creator.createCommits("release210", 1)
-        creator.createTag("version/2.1.1", "create release tag", cRelease4)
+        creator.createTag("version/11.1.1", "create release tag", cRelease4)
 
         return creator
     }
@@ -273,7 +270,7 @@ class GitCreatorThreeNumbers {
     static TestRepoCreator initTest18(File dir, String buildFileContent) {
         TestRepoCreator creator = initTest17(dir, buildFileContent)
 
-        creator.setBranch("release/2")
+        creator.setBranch("support/11")
         creator.createCommits("release212", 2)
 
         return creator

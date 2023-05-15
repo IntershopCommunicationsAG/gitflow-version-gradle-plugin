@@ -110,7 +110,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 mainBranch = "master"
                 developBranch = "develop"
                 hotfixPrefix = "hotfix"
-                featurePrefix = "features"
+                featurePrefix = "feature"
                 releasePrefix = "release"
             }
             
@@ -164,7 +164,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 mainBranch = "master"
                 developBranch = "develop"
                 hotfixPrefix = "hotfix"
-                featurePrefix = "features"
+                featurePrefix = "feature"
                 releasePrefix = "release"
                 
                 fullbranch = true
@@ -220,7 +220,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 mainBranch = "master"
                 developBranch = "develop"
                 hotfixPrefix = "hotfix"
-                featurePrefix = "features"
+                featurePrefix = "feature"
                 releasePrefix = "release"
             }
             
@@ -380,7 +380,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 mainBranch = "master"
                 developBranch = "develop"
                 hotfixPrefix = "hotfix"
-                featurePrefix = "features"
+                featurePrefix = "feature"
                 releasePrefix = "release"
             }
             
@@ -409,7 +409,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         File gradleproperties = new File(testProjectDir, "gradle.properties")
         gradleproperties << """
             systemProp.MERGE_BUILD = true
-            systemProp.PR_SOURCE_BRANCH = refs/heads/features/team2/45678-merge_message
+            systemProp.PR_SOURCE_BRANCH = refs/heads/feature/team2/45678-merge_message
             systemProp.PR_ID = 409
             systemProp.BUILD_ID = 12345
         """.stripIndent()
@@ -442,7 +442,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 mainBranch = "master"
                 developBranch = "develop"
                 hotfixPrefix = "hotfix"
-                featurePrefix = "features"
+                featurePrefix = "feature"
                 releasePrefix = "release"
             }
             
@@ -472,7 +472,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         List<String> argsextra = [':showVersion', '-i', '-s',
                                   '-PmergeBuild=true',
-                                  '-PsourceBranch=refs/heads/features/team2/147852-merge_message',
+                                  '-PsourceBranch=refs/heads/feature/team2/147852-merge_message',
                                   '-PpullRequestID=420',
                                   '-PbuildID=456789']
 
@@ -503,7 +503,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 mainBranch = "master"
                 developBranch = "develop"
                 hotfixPrefix = "hotfix"
-                featurePrefix = "features"
+                featurePrefix = "feature"
                 releasePrefix = "release"
             }
             
@@ -535,7 +535,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         def result3 = getPreparedGradleRunner()
                 .withArguments(args)
                 .withEnvironment([ 'MERGE_BUILD' : 'true',
-                               'PR_SOURCE_BRANCH' : 'refs/heads/features/team2/987532-merge_message',
+                               'PR_SOURCE_BRANCH' : 'refs/heads/feature/team2/987532-merge_message',
                                'PR_ID' : '439',
                                'BUILD_ID' : '963258'])
                 .withGradleVersion(gradleVersion)
@@ -563,7 +563,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
                 mainBranch = "master"
                 developBranch = "develop"
                 hotfixPrefix = "hotfix"
-                featurePrefix = "features"
+                featurePrefix = "feature"
                 releasePrefix = "release"
             }
             
@@ -607,5 +607,31 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
 
         where:
         gradleVersion << supportedGradleVersions
+    }
+
+    def 'test support branch'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"
+                
+                defaultVersion = "2.0.0"
+                mainBranch = "master"
+                developBranch = "develop"
+                hotfixPrefix = "hotfix"
+                featurePrefix = "feature"
+                releasePrefix = "release"
+            }
+            
+            version = gitflowVersion.version
+           
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
+        creator.setBranch("master")
     }
 }

@@ -36,6 +36,7 @@ version to "local".
 |*hotfixPrefix*     | String | hotfix        | Prefix for hotfix branches, used for bug fix development
 |*featurePrefix*    | String | feature       | Prefix for feature branches, used for feature development
 |*releasePrefix*    | String | release       | Prefix for release branches, used for release preparation
+|*supportPrefix*    | String | support       | Prefix for support branches
 |*versionPrefix*    | String | version       | Prefix for version tags
 |*separator*        | String | /             | Separator for branches and tags
 |*versionType*      | String | three         | Type of the version - *three* digits or *four* digits version number. Possible values are `three` or `four`
@@ -66,6 +67,7 @@ gitflowVersion {
     hotfixPrefix = "hotfix"
     featurePrefix = "feature"
     releasePrefix = "release"
+    supportPrefix = "support"
 }
 
 version = gitflowVersion.version
@@ -94,6 +96,7 @@ gitflowVersion {
     hotfixPrefix = "hotfix"
     featurePrefix = "feature"
     releasePrefix = "release"
+    supportPrefix = "support"
 }
 
 version = gitflowVersion.version
@@ -116,6 +119,9 @@ Example: branch is feature/1234_branch-name -> '1234.34354645645554455344-SNAPSH
 * Release branches (release)
 The version is calculated from the branch name and extended with SNAPSHOT.
 Example: release/7.11 -> '7.11.0.0-SNAPSHOT' (Version type is 'four')
+
+* Support branches (support)
+The version is calculated from tags. The branch is used for LTS releases after a new major version is created.
 
 == Tasks
 
