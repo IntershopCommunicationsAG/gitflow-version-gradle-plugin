@@ -57,6 +57,18 @@ class GitIntegrationSpecialSpec extends AbstractIntegrationGroovySpec {
         println(" - develop -> dev-SNAPSHOT")
         preVersion == null
         println(' - develop -> pre version is null')
+
+        when: 'on master'
+        creator.setBranch("feature/major")
+        gvs = getConfGitVersionService(creator.directory)
+        version = gvs.version
+        preVersion = null
+
+        then: 'version is major-SNAPSHOT'
+        version == "major-SNAPSHOT"
+        println(" - feature/major -> major-SNAPSHOT")
+        preVersion == null
+        println(' - feature/major -> pre version is null')
     }
 
 }

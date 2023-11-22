@@ -47,6 +47,7 @@ open class VersionExtension @Inject constructor(project: Project,
     private val defaultVersionProperty = objectFactory.property(String::class.java)
     private val mainBranchProperty = objectFactory.property(String::class.java)
     private val developBranchProperty = objectFactory.property(String::class.java)
+    private val majorBranchProperty = objectFactory.property(String::class.java)
     private val hotfixPrefixProperty = objectFactory.property(String::class.java)
     private val featurePrefixProperty = objectFactory.property(String::class.java)
     private val releasePrefixProperty = objectFactory.property(String::class.java)
@@ -67,6 +68,7 @@ open class VersionExtension @Inject constructor(project: Project,
         defaultVersionProperty.convention("1.0.0")
         mainBranchProperty.convention("master")
         developBranchProperty.convention("develop")
+        majorBranchProperty.convention("major")
         hotfixPrefixProperty.convention("hotfix")
         featurePrefixProperty.convention("feature")
         releasePrefixProperty.convention("release")
@@ -121,6 +123,19 @@ open class VersionExtension @Inject constructor(project: Project,
     var developBranch : String
         get() = developBranchProperty.get()
         set(value) = developBranchProperty.set(value)
+
+    /**
+     * This is provider for the developBranch property.
+     */
+    val majorBranchProvider: Provider<String>
+        get() = majorBranchProperty
+
+    /**
+     * This is developBranch property.
+     */
+    var majorBranch : String
+        get() = majorBranchProperty.get()
+        set(value) = majorBranchProperty.set(value)
 
     /**
      * This is provider for the hotfixPrefix property.
@@ -241,6 +256,7 @@ open class VersionExtension @Inject constructor(project: Project,
         versionService.defaultVersion = Version.forString(defaultVersionProperty.get(), vType)
         versionService.mainBranch = mainBranchProperty.get()
         versionService.developBranch = developBranchProperty.get()
+        versionService.majorBranch = majorBranchProperty.get()
         versionService.featurePrefix = featurePrefixProperty.get()
         versionService.hotfixPrefix = hotfixPrefixProperty.get()
         versionService.releasePrefix = releasePrefixProperty.get()

@@ -17,6 +17,7 @@ package com.intershop.gradle.gitflow.utils
 
 import com.intershop.release.version.Version
 import com.intershop.release.version.VersionType
+import com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.NamespaceVersion.getLatestVersion
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.lib.Constants
@@ -94,6 +95,13 @@ class GitVersionService @JvmOverloads constructor(
      * Default value is develop.
      */
     var developBranch: String = "develop"
+
+    /**
+     * Name/path of the feature branch with major
+     * changes for the next major version.
+     * The branch starts with feature.
+     */
+    var majorBranch: String = "major"
 
     /**
      * Prefix of a hotfix branch.
@@ -174,9 +182,9 @@ class GitVersionService @JvmOverloads constructor(
 
     private val changed: Boolean by lazy {
         val status = client.status().call()
-        val rv = status.untracked.size > 0 || status.uncommittedChanges.size > 0 ||
-                status.removed.size > 0 || status.added.size > 0 ||
-                status.changed.size > 0 || status.modified.size > 0
+        val rv = status.untracked.isNotEmpty() || status.uncommittedChanges.isNotEmpty() ||
+                status.removed.isNotEmpty() || status.added.isNotEmpty() ||
+                status.changed.isNotEmpty()|| status.modified.isNotEmpty()
 
         if(log.isInfoEnabled && rv) {
             log.info("There are local changes on the repository.")
@@ -325,7 +333,7 @@ class GitVersionService @JvmOverloads constructor(
 
     val versionWithID: String by lazy {
         val tag = getVersionTagFrom(Constants.HEAD)
-        var rv: String
+        val rv: String
 
 
         if(! localOnly) {
@@ -376,7 +384,7 @@ class GitVersionService @JvmOverloads constructor(
     val version: String by lazy {
 
         val tag = getVersionTagFrom(Constants.HEAD)
-        var rv: String
+        val rv: String
 
         if(! localOnly) {
             when {
@@ -428,7 +436,7 @@ class GitVersionService @JvmOverloads constructor(
      */
     val containerVersion: String by lazy {
         val tag = getVersionTagFrom(Constants.HEAD)
-        var rv: String
+        val rv: String
 
         if(! localOnly) {
             when {
@@ -544,6 +552,11 @@ class GitVersionService @JvmOverloads constructor(
 
         val bname = branchName.substring("${prefix}${separator}".length)
         val sname = bname.split("/".toRegex(), 2)
+
+        if(prefix == featurePrefix && bname == majorBranch) {
+            return majorBranch
+        }
+
         val fname = if(sname.size > 1) {
                         sname[1].replace("/", "_").shortened()
                     } else {
