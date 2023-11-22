@@ -38,6 +38,9 @@ class GitCreatorSpecialVersions {
         creator.createBranch("feature/JIRA-2", cDevelop)
         creator.createCommits("jira2", 3)
 
+        creator.setBranch("develop")
+        creator.createBranch("feature/major", cDevelop)
+
         return creator
     }
 
