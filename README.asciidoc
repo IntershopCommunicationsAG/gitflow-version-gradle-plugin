@@ -1,5 +1,5 @@
 = GitFlow Version Plugin
-:latestRevision: 1.0.2
+:latestRevision: 1.10.0
 :toc:
 :icons: font
 
@@ -93,6 +93,7 @@ gitflowVersion {
     defaultVersion = "2.0.0"
     mainBranch = "master"
     developBranch = "develop"
+    majorBranch = "major"
     hotfixPrefix = "hotfix"
     featurePrefix = "feature"
     releasePrefix = "release"
@@ -122,6 +123,9 @@ Example: release/7.11 -> '7.11.0.0-SNAPSHOT' (Version type is 'four')
 
 * Support branches (support)
 The version is calculated from tags. The branch is used for LTS releases after a new major version is created.
+
+* Major branch
+The version is always <major_branch_name>-SNAPSHOT. The branch is a feature branch with major changes, therefore the prefix is always feature. So the complete default path is feature/major.
 
 == Tasks
 

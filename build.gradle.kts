@@ -51,7 +51,7 @@ plugins {
 // release configuration
 group = "com.intershop.gradle.version"
 description = "Gradle SCM version plugin - SCM based version handling for Gradle"
-version = "1.9.0"
+version = "1.10.0"
 
 
 val sonatypeUsername: String by project
@@ -252,7 +252,7 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
-    testRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.6")
+    testRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.13")
     testRuntimeOnly("org.slf4j:slf4j-api:1.7.25")
 
     testImplementation("com.github.stefanbirkner:system-rules:1.19.0" )
@@ -260,5 +260,5 @@ dependencies {
     testImplementation("com.intershop.gradle.test:test-gradle-plugin:4.1.1")
     testImplementation(gradleTestKit())
 
-    testImplementation("commons-io:commons-io:2.2")
+    testImplementation("commons-io:commons-io:2.7")
 }
