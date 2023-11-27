@@ -59,6 +59,18 @@ class GitIntegrationThreeNumbersSpec extends AbstractIntegrationGroovySpec {
         preVersion == null
         println(' - develop -> pre version is null')
 
+        when: 'on feature/major branch'
+        creator.setBranch("feature/major")
+        gvs = getConfGitVersionService(creator.directory)
+        version = gvs.version
+        preVersion = gvs.previousVersion
+
+        then: 'version is major-SNAPSHOT'
+        version == "major-SNAPSHOT"
+        println(" - feature/major -> major-SNAPSHOT")
+        preVersion == null
+        println(' - feature/major -> pre version is null')
+
         when: 'on hotfix branch hotfix/JIRA-1'
         creator.setBranch("hotfix/JIRA-1")
         gvs = getConfGitVersionService(creator.directory)
