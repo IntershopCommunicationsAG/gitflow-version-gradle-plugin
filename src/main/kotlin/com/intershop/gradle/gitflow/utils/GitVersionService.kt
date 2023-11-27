@@ -17,7 +17,6 @@ package com.intershop.gradle.gitflow.utils
 
 import com.intershop.release.version.Version
 import com.intershop.release.version.VersionType
-import com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.NamespaceVersion.getLatestVersion
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.lib.Constants
@@ -276,9 +275,11 @@ class GitVersionService @JvmOverloads constructor(
     }
 
     private fun versionFromFeature(isContainer: Boolean) : String {
-        val v = "${ versionForLocalChanges( "", "local-"
-                            )}${getBranchNameForVersion(featurePrefix, branch)}"
-
+        val v  = if (branch == featurePrefix+separator+majorBranch) {
+            majorBranch
+        } else {
+            "${versionForLocalChanges("", "local-")}${getBranchNameForVersion(featurePrefix, branch)}"
+        }
         return if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
     }
 

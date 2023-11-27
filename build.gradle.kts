@@ -54,7 +54,7 @@ description = "Gradle SCM version plugin - SCM based version handling for Gradle
 version = "1.10.0"
 
 
-val sonatypeUsername: String by project
+val sonatypeUsername: String? by project
 val sonatypePassword: String? by project
 
 repositories {
