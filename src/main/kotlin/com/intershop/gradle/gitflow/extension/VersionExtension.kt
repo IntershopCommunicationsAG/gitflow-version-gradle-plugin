@@ -267,7 +267,7 @@ open class VersionExtension @Inject constructor(project: Project,
 
         val localVersion: Provider<String> = providerFactory.gradleProperty("localVersion")
 
-        versionService.localOnly = localVersion.getOrElse("false").lowercase(Locale.getDefault()) == "true"
+        versionService.localOnly = localVersion.getOrElse("false").lowercase(Locale.getDefault()).trim() == "true"
 
         versionService.isMergeBuild =
             getValueFor("MERGE_BUILD", "mergeBuild", "false")
