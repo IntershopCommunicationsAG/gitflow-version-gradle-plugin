@@ -1,9 +1,9 @@
 = GitFlow Version Plugin
-:latestRevision: 1.10.0
+:latestRevision: 2.0.0
 :toc:
 :icons: font
 
-NOTE: This plugins requires Gradle 6 and later.
+NOTE: This plugins requires Gradle 8.5 and later.
 
 == Summary
 This plugin calculates the version from the Git repository. The plugin assumes that the used workflow follows the GitFlow principle. See https://infos.seibert-media.net/display/Productivity/Git-Workflows+-+Der+Gitflow-Workflow (DE) or https://datasift.github.io/gitflow/IntroducingGitFlow.html (EN).
@@ -29,22 +29,23 @@ version to "local".
 === Properties
 [cols="20%,15%,15%,50%", width="95%", options="header"]
 |===
-|Property           | Type   | Default value | Description
-|*defaultVersion*   | String | 1.0.0         | This is the default version if no other information is available
-|*mainBranch*       | String | master        | Name of the main branch, used for release version
-|*developBranch*    | String | develop       | Name of the developer branch, used for integration
-|*hotfixPrefix*     | String | hotfix        | Prefix for hotfix branches, used for bug fix development
-|*featurePrefix*    | String | feature       | Prefix for feature branches, used for feature development
-|*releasePrefix*    | String | release       | Prefix for release branches, used for release preparation
-|*supportPrefix*    | String | support       | Prefix for support branches
-|*versionPrefix*    | String | version       | Prefix for version tags
-|*separator*        | String | /             | Separator for branches and tags
-|*versionType*      | String | three         | Type of the version - *three* digits or *four* digits version number. Possible values are `three` or `four`
-|*versionService*   | String | (read only)   | Service for version calculation
-|*version*          | String | (read only)   | This is the calculated version
-|*previousVersion*  | String | (read only)   | This is the calculated previous version on the branch
-|*branchName*       | String | (read only)   | This is the current branch name
-|*fullbranch*        | Boolean | false        | If this is true, the branch name is used as a part of the version
+|Property           | Type    | Default value | Description
+|*defaultVersion*   | String  | 1.0.0         | This is the default version if no other information is available
+|*mainBranch*       | String  | master        | Name of the main branch, used for release version
+|*developBranch*    | String  | develop       | Name of the developer branch, used for integration
+|*majorBranch*      | String  | major         | Name of the major-version branch, used for next major version development
+|*hotfixPrefix*     | String  | hotfix        | Prefix for hotfix branches, used for bug fix development
+|*featurePrefix*    | String  | feature       | Prefix for feature branches, used for feature development
+|*releasePrefix*    | String  | release       | Prefix for release branches, used for release preparation
+|*supportPrefix*    | String  | support       | Prefix for support branches
+|*versionPrefix*    | String  | version       | Prefix for version tags
+|*separator*        | String  | /             | Separator for branches and tags
+|*versionType*      | String  | three         | Type of the version - *three* digits or *four* digits version number. Possible values are `three` or `four`
+|*versionService*   | String  | (read only)   | Service for version calculation
+|*version*          | String  | (read only)   | This is the calculated version
+|*previousVersion*  | String  | (read only)   | This is the calculated previous version on the branch
+|*branchName*       | String  | (read only)   | This is the current branch name
+|*fullbranch*       | Boolean | false         | If this is true, the branch name is used as a part of the version
 |===
 
 ++++
