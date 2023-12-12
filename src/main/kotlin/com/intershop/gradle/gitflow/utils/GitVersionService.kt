@@ -17,7 +17,6 @@ package com.intershop.gradle.gitflow.utils
 
 import com.intershop.release.version.Version
 import com.intershop.release.version.VersionType
-import com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.NamespaceVersion.getLatestVersion
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.lib.Constants
