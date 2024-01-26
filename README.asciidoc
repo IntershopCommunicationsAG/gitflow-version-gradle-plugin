@@ -138,6 +138,10 @@ The version is always <major_branch_name>-SNAPSHOT. The branch is a feature bran
 | createChangLog | CreateChangLog | Creates a changelog for the current working copy, starting with the previous version or with the first commit if there is no previous version
 |===
 
+== Contribute
+
+See link:https://github.com/IntershopCommunicationsAG/.github/blob/main/CONTRIBUTE.asciidoc[here] for details.
+
 == License
 
 Copyright 2014-2020 Intershop Communications.
