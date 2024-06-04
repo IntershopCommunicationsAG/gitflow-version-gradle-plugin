@@ -359,6 +359,9 @@ class GitVersionService @JvmOverloads constructor(
                 branch.startsWith("${releasePrefix}${separator}") -> {
                     rv = versionFromRelease(false)
                 }
+                branch.startsWith("${supportPrefix}${separator}") -> {
+                    rv = versionFromSupport( false)
+                }
                 else -> {
                     val branches = getBranchListForRef()
                     rv = when {
