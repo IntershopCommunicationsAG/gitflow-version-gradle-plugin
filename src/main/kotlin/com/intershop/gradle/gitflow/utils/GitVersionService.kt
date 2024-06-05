@@ -285,45 +285,43 @@ class GitVersionService @JvmOverloads constructor(
     private fun versionFromRelease(isContainer: Boolean) : String {
         // version = 'branchname'-SNAPSHOT or increased version from tag ...
         val vb = getLatestVersion()
+        val addMetaData = versionForLocalChanges("", "local")
+
         return if (vb == defaultVersion) {
             val branchName = getBranchNameForVersion(releasePrefix, branch)
-            val vrb = Version.forString(branchName, versionType)
-            val v = versionForLocalChanges("${vrb}", "${vrb}-local")
-            if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
+            var vrb = Version.forString(branchName, versionType)
+            setMetaData(vrb, isContainer, addMetaData).toString()
         } else {
-            val addMetaData = versionForLocalChanges("", "local")
-            if (addMetaData.isNotBlank()) {
-                if(isContainer) {
-                    vb.setBranchMetadata("${addMetaData}-latest").toString()
-                } else {
-                    vb.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
-                }
-            } else {
-                vb.toString()
-            }
+            setMetaData(vb, isContainer, addMetaData).toString()
         }
     }
 
     private fun versionFromSupport(isContainer: Boolean) : String {
         // version = 'branchname'-SNAPSHOT or increased version from tag ...
         val vb = getLatestVersion()
+        val addMetaData = versionForLocalChanges("", "local")
+
         return if (vb == defaultVersion) {
             val branchName = getBranchNameForVersion(supportPrefix, branch)
-            val vrb = Version.forString(branchName, versionType)
-            val v = versionForLocalChanges("${vrb}", "${vrb}-local")
-            if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
+            var vrb = Version.forString(branchName, versionType)
+            setMetaData(vrb, isContainer, addMetaData).toString()
         } else {
-            val addMetaData = versionForLocalChanges("", "local")
-            if (addMetaData.isNotBlank()) {
-                if(isContainer) {
-                    vb.setBranchMetadata("${addMetaData}-latest").toString()
-                } else {
-                    vb.setBranchMetadata("${addMetaData}-SNAPSHOT").toString()
-                }
-            } else {
-                vb.toString()
-            }
+            setMetaData(vb, isContainer, addMetaData).toString()
         }
+    }
+
+    private fun setMetaData(v: Version, isContainer: Boolean, branchMetaData: String): Version {
+        var rv = if (branchMetaData.isNotBlank()) {
+            v.setBranchMetadata(branchMetaData)
+        } else {
+            v
+        }
+        rv = if(isContainer) {
+            rv.setBuildMetadata("latest")
+        } else {
+            rv.setBuildMetadata("SNAPSHOT")
+        }
+        return rv
     }
 
     /**
@@ -480,6 +478,7 @@ class GitVersionService @JvmOverloads constructor(
                     }
                 }
             }
+
         } else {
             rv = "LOCAL"
         }
