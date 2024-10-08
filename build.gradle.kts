@@ -245,16 +245,16 @@ dependencies {
     implementation(gradleKotlinDsl())
 
     //jgit
-    implementation("org.eclipse.jgit:org.eclipse.jgit:6.8.0.202311291450-r") {
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r") {
         exclude(group = "org.apache.httpcomponents", module = "httpclient")
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
     testRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.14")
-    testRuntimeOnly("org.slf4j:slf4j-api:2.0.9")
+    testRuntimeOnly("org.slf4j:slf4j-api:2.0.16")
 
-    testImplementation("com.intershop.gradle.test:test-gradle-plugin:5.0.1")
+    testImplementation("com.intershop.gradle.test:test-gradle-plugin:5.1.0")
     testImplementation(gradleTestKit())
 
-    testImplementation("commons-io:commons-io:2.15.1")
+    testImplementation("commons-io:commons-io:2.17.0")
 }
