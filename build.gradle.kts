@@ -89,7 +89,7 @@ if (project.version.toString().endsWith("-SNAPSHOT")) {
 tasks {
     withType<Test>().configureEach {
         maxParallelForks = 1
-        systemProperty("intershop.gradle.versions", "8.5")
+        systemProperty("intershop.gradle.versions", "8.5,8.10.2")
         useJUnitPlatform()
     }
 
