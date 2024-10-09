@@ -18,6 +18,7 @@ import org.asciidoctor.gradle.jvm.AsciidoctorTask
 plugins {
     // project plugins
     `java-gradle-plugin`
+    `jvm-test-suite`
     groovy
     kotlin("jvm") version "1.9.25"
 
@@ -86,13 +87,34 @@ if (project.version.toString().endsWith("-SNAPSHOT")) {
     status = "snapshot"
 }
 
-tasks {
-    withType<Test>().configureEach {
-        maxParallelForks = 1
-        systemProperty("intershop.gradle.versions", "8.5,8.10.2")
-        useJUnitPlatform()
-    }
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useSpock()
 
+            dependencies {
+                runtimeOnly("org.apache.httpcomponents:httpclient:4.5.14")
+                runtimeOnly("org.slf4j:slf4j-api:2.0.16")
+
+                implementation(gradleTestKit())
+                implementation("com.intershop.gradle.test:test-gradle-plugin:5.1.0")
+                implementation("commons-io:commons-io:2.17.0")
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        maxParallelForks = 1
+                        // Gradle versions for test
+                        systemProperty("intershop.gradle.versions", "8.5,8.10.2")
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks {
     register<Copy>("copyAsciiDoc") {
         includeEmptyDirs = false
 
@@ -249,12 +271,4 @@ dependencies {
         exclude(group = "org.apache.httpcomponents", module = "httpclient")
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-
-    testRuntimeOnly("org.apache.httpcomponents:httpclient:4.5.14")
-    testRuntimeOnly("org.slf4j:slf4j-api:2.0.16")
-
-    testImplementation("com.intershop.gradle.test:test-gradle-plugin:5.1.0")
-    testImplementation(gradleTestKit())
-
-    testImplementation("commons-io:commons-io:2.17.0")
 }
