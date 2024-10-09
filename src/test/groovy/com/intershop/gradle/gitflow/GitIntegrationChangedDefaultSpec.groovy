@@ -16,7 +16,6 @@
 package com.intershop.gradle.gitflow
 
 import com.intershop.gradle.gitflow.utils.GitCreatorChangedDefault
-import com.intershop.gradle.gitflow.utils.GitCreatorFourNumbers
 import com.intershop.gradle.gitflow.utils.GitVersionService
 import com.intershop.gradle.gitflow.utils.TestRepoCreator
 import com.intershop.gradle.test.AbstractIntegrationGroovySpec
