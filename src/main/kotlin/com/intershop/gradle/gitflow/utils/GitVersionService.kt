@@ -358,6 +358,9 @@ class GitVersionService @JvmOverloads constructor(
                 branch.startsWith("${releasePrefix}${separator}") -> {
                     rv = versionFromRelease(false)
                 }
+                branch.startsWith("${supportPrefix}${separator}") -> {
+                    rv = versionFromSupport(false)
+                }
                 else -> {
                     val branches = getBranchListForRef()
                     rv = when {
@@ -366,6 +369,10 @@ class GitVersionService @JvmOverloads constructor(
                         branches.contains(releasePrefix) -> {
                             val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)
+                        }
+                        branches.contains(supportPrefix) -> {
+                            val bn = branches.first { it.startsWith("${supportPrefix}${separator}") }
+                            getBranchNameForVersion(supportPrefix, bn)
                         }
                         else -> "version-id${buildID}-SNAPSHOT"
                     }
