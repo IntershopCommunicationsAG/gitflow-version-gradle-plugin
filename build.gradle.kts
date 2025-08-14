@@ -43,6 +43,8 @@ plugins {
 
     // plugin for publishing to Gradle Portal
     id("com.gradle.plugin-publish") version "1.3.0"
+
+    id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1"
 }
 
 // release configuration
