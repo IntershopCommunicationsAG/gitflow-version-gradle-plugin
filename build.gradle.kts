@@ -21,7 +21,7 @@ plugins {
     `java-gradle-plugin`
     `jvm-test-suite`
     groovy
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm") version "2.2.10"
 
     // test coverage
     jacoco
@@ -36,13 +36,13 @@ plugins {
     signing
 
     // plugin for documentation
-    id("org.asciidoctor.jvm.convert") version "4.0.3"
+    id("org.asciidoctor.jvm.convert") version "4.0.5"
 
     // documentation
-    id("org.jetbrains.dokka") version "1.9.20"
+    id("org.jetbrains.dokka-javadoc") version "2.0.0"
 
     // plugin for publishing to Gradle Portal
-    id("com.gradle.plugin-publish") version "1.3.0"
+    id("com.gradle.plugin-publish") version "2.0.0"
 
     id("io.gitee.pkmer.pkmerboot-central-publisher") version "1.1.1"
 }
@@ -58,8 +58,8 @@ val sonatypeUsername: String? by project
 val sonatypePassword: String? by project
 
 repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
 }
 
 val pluginUrl = "https://github.com/IntershopCommunicationsAG/${project.name}"
@@ -81,7 +81,7 @@ java {
     withJavadocJar()
     withSourcesJar()
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -96,12 +96,9 @@ testing {
             useSpock()
 
             dependencies {
-                runtimeOnly("org.apache.httpcomponents:httpclient:4.5.14")
-                runtimeOnly("org.slf4j:slf4j-api:2.0.16")
-
                 implementation(gradleTestKit())
                 implementation("com.intershop.gradle.test:test-gradle-plugin:5.1.0")
-                implementation("commons-io:commons-io:2.17.0")
+                implementation("commons-io:commons-io:2.20.0")
             }
 
             targets {
@@ -109,7 +106,7 @@ testing {
                     testTask.configure {
                         maxParallelForks = 1
                         // Gradle versions for test
-                        systemProperty("intershop.gradle.versions", "8.5,8.10.2")
+                        systemProperty("intershop.gradle.versions", "8.5,8.10.2,9.0.0")
                     }
                 }
             }
@@ -182,10 +179,6 @@ tasks {
         dependsOn("asciidoctor")
     }
 
-    dokkaJavadoc.configure {
-        outputDirectory.set(project.layout.buildDirectory.dir("dokka"))
-    }
-
     withType<Sign> {
         val sign = this
         withType<PublishToMavenLocal> {
@@ -198,8 +191,8 @@ tasks {
 
     afterEvaluate {
         getByName<Jar>("javadocJar") {
-            dependsOn(dokkaJavadoc)
-            from(dokkaJavadoc)
+            dependsOn(dokkaGenerate)
+            from(dokkaGeneratePublicationJavadoc)
         }
     }
 }
@@ -285,8 +278,5 @@ dependencies {
     implementation(gradleKotlinDsl())
 
     //jgit
-    implementation("org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r") {
-        exclude(group = "org.apache.httpcomponents", module = "httpclient")
-        exclude(group = "org.slf4j", module = "slf4j-api")
-    }
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
 }
