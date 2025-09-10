@@ -97,7 +97,7 @@ testing {
 
             dependencies {
                 implementation(gradleTestKit())
-                implementation("com.intershop.gradle.test:test-gradle-plugin:5.1.0")
+                implementation("com.intershop.gradle.test:test-gradle-plugin:5.1.1")
                 implementation("commons-io:commons-io:2.20.0")
             }
 
