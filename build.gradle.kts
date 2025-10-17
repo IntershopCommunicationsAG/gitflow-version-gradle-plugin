@@ -97,7 +97,7 @@ testing {
 
             dependencies {
                 implementation(gradleTestKit())
-                implementation("com.intershop.gradle.test:test-gradle-plugin:5.1.1")
+                implementation("com.intershop.gradle.test:test-gradle-plugin:6.0.0")
                 implementation("commons-io:commons-io:2.20.0")
             }
 
@@ -106,7 +106,7 @@ testing {
                     testTask.configure {
                         maxParallelForks = 1
                         // Gradle versions for test
-                        systemProperty("intershop.gradle.versions", "8.5,8.10.2,9.0.0")
+                        systemProperty("intershop.gradle.versions", "8.5,8.10.2,9.1.0")
                     }
                 }
             }
@@ -171,8 +171,7 @@ tasks {
             html.outputLocation.set(project.layout.buildDirectory.dir("jacocoHtml"))
         }
 
-        val jacocoTestReport by tasks
-        jacocoTestReport.dependsOn("test")
+        dependsOn(test)
     }
 
     jar.configure {
@@ -274,9 +273,9 @@ signing {
 }
 
 dependencies {
-    implementation("com.intershop.gradle.version:extended-version:3.1.0")
     implementation(gradleKotlinDsl())
+    implementation("com.intershop.gradle.version:extended-version:4.0.0")
 
     //jgit
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.4.0.202509020913-r")
 }
