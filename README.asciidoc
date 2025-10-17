@@ -1,5 +1,5 @@
 = GitFlow Version Plugin
-:latestRevision: 2.0.0
+:latestRevision: 3.0.0
 :toc:
 :icons: font
 
