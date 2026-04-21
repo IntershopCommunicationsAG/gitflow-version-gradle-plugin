@@ -244,8 +244,12 @@ class GitVersionService @JvmOverloads constructor(
         return "${bBranchName}-pr${pullRequestID}"
     }
 
-    private fun versionFromDevBranch() : String {
-        return versionForLocalChanges("dev", "local-dev")
+    private fun versionFromSpecialBranch(versionName: String, isContainer: Boolean, uniqueID: String) : String {
+        val v = versionForLocalChanges(versionName, "local-${versionName}")
+        val idStr = if(uniqueID.isNotEmpty()) "-id${uniqueID}" else ""
+        val ext = if(isContainer) { "-latest" } else { "-SNAPSHOT" }
+
+        return "${ v }${idStr}${ext}"
     }
 
     private fun versionFromHotfix(isContainer: Boolean) : String {
@@ -330,7 +334,10 @@ class GitVersionService @JvmOverloads constructor(
                     rv = versionFromBranch(false, buildID)
                 }
                 branch == developBranch -> {
-                    rv = "${versionFromDevBranch()}-id${buildID}-SNAPSHOT"
+                    rv = versionFromSpecialBranch("dev", false, buildID)
+                }
+                branch == majorBranch -> {
+                    rv = versionFromSpecialBranch("major", false, buildID)
                 }
                 branch.startsWith("${hotfixPrefix}${separator}") -> {
                     rv = versionFromHotfix(false)
@@ -348,7 +355,7 @@ class GitVersionService @JvmOverloads constructor(
                     val branches = getBranchListForRef()
                     rv = when {
                         branches.contains(mainBranch) -> versionFromBranch(false, buildID)
-                        branches.contains(developBranch) -> "${versionFromDevBranch()}-id${buildID}-SNAPSHOT"
+                        branches.contains(developBranch) -> versionFromSpecialBranch("dev", false, buildID)
                         branches.contains(releasePrefix) -> {
                             val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)
@@ -387,7 +394,10 @@ class GitVersionService @JvmOverloads constructor(
                     rv = versionFromBranch(false,"")
                 }
                 branch == developBranch -> {
-                    rv = "${versionFromDevBranch()}-SNAPSHOT"
+                    rv = versionFromSpecialBranch("dev", false, "")
+                }
+                branch == majorBranch -> {
+                    rv = versionFromSpecialBranch("major", false, "")
                 }
                 branch.startsWith("${supportPrefix}${separator}") -> {
                     rv = versionFromBranch(false, "")
@@ -405,7 +415,7 @@ class GitVersionService @JvmOverloads constructor(
                     val branches = getBranchListForRef()
                     rv = when {
                         branches.contains(mainBranch) -> versionFromBranch(false, "")
-                        branches.contains(developBranch) -> "${versionFromDevBranch()}-SNAPSHOT"
+                        branches.contains(developBranch) -> versionFromSpecialBranch("dev", false, "")
                         branches.contains(releasePrefix) -> {
                             val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)
@@ -439,7 +449,10 @@ class GitVersionService @JvmOverloads constructor(
                     rv = versionFromBranch(true, "")
                 }
                 branch == developBranch -> {
-                    rv = "${versionFromDevBranch()}-latest"
+                    rv = versionFromSpecialBranch("dev", true, "")
+                }
+                branch == majorBranch -> {
+                    rv = versionFromSpecialBranch("major", true, "")
                 }
                 branch.startsWith("${supportPrefix}${separator}") -> {
                     rv = versionFromBranch(true, "")
@@ -457,7 +470,7 @@ class GitVersionService @JvmOverloads constructor(
                     val branches = getBranchListForRef()
                     rv = when {
                         branches.contains(mainBranch) -> versionFromBranch(true, "")
-                        branches.contains(developBranch) -> "${versionFromDevBranch()}-latest"
+                        branches.contains(developBranch) -> versionFromSpecialBranch("dev", true, "")
                         branches.contains(releasePrefix) -> {
                             val bn = branches.first { it.startsWith("${releasePrefix}${separator}") }
                             getBranchNameForVersion(releasePrefix, bn)

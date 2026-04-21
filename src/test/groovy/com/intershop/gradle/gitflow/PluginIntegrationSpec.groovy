@@ -676,4 +676,74 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         where:
         gradleVersion << supportedGradleVersions
     }
+
+    def 'test major branch'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"       
+                defaultVersion = "2.0.0" 
+            }
+            
+            version = gitflowVersion.version
+           
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithMajor(testProjectDir, buildFileContent)
+        creator.setBranch("major")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("major-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test major branch with BuildID'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"       
+                defaultVersion = "2.0.0" 
+            }
+            
+            version = gitflowVersion.version
+           
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithMajor(testProjectDir, buildFileContent)
+        creator.setBranch("major")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PbuildID=12356']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("major-id12356-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
 }
