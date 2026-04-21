@@ -615,21 +615,135 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
             }
             
             gitflowVersion {
-                versionType = "three"
-                
-                defaultVersion = "2.0.0"
-                mainBranch = "master"
-                developBranch = "develop"
-                hotfixPrefix = "hotfix"
-                featurePrefix = "feature"
-                releasePrefix = "release"
+                versionType = "three"       
+                defaultVersion = "2.0.0" 
             }
             
             version = gitflowVersion.version
            
         """.stripIndent()
 
-        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepo(testProjectDir, buildFileContent)
-        creator.setBranch("master")
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithSupport(testProjectDir, buildFileContent)
+        creator.setBranch("support/3")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("3.0.1-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test support branch with BuildID'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"       
+                defaultVersion = "2.0.0" 
+            }
+            
+            version = gitflowVersion.version
+           
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithSupport(testProjectDir, buildFileContent)
+        creator.setBranch("support/3")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PbuildID=456789']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("3.0.1-id456789-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test major branch'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"       
+                defaultVersion = "2.0.0" 
+            }
+            
+            version = gitflowVersion.version
+           
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithMajor(testProjectDir, buildFileContent)
+        creator.setBranch("major")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("major-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
+    }
+
+    def 'test major branch with BuildID'() {
+        given:
+        def buildFileContent = """
+            plugins {
+                id 'com.intershop.gradle.version.gitflow'
+            }
+            
+            gitflowVersion {
+                versionType = "three"       
+                defaultVersion = "2.0.0" 
+            }
+            
+            version = gitflowVersion.version
+           
+        """.stripIndent()
+
+        TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithMajor(testProjectDir, buildFileContent)
+        creator.setBranch("major")
+
+        when:
+        List<String> args = [':showVersion', '-i', '-s', '-PbuildID=12356']
+
+        def result1 = getPreparedGradleRunner()
+                .withArguments(args)
+                .withGradleVersion(gradleVersion)
+                .build()
+
+        then:
+        result1.task(":showVersion").outcome == TaskOutcome.SUCCESS
+        result1.output.contains("major-id12356-SNAPSHOT")
+
+        where:
+        gradleVersion << supportedGradleVersions
     }
 }
