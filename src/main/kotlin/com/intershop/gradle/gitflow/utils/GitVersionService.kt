@@ -258,11 +258,15 @@ class GitVersionService @JvmOverloads constructor(
         return if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
     }
 
-    private fun versionFromFeature(isContainer: Boolean) : String {
-        val v = "${ versionForLocalChanges( "", "local-"
-                            )}${getBranchNameForVersion(featurePrefix, branch)}"
+    private fun versionFromFeature(isContainer: Boolean, uniqueID: String) : String {
+        val vb = getBranchNameForVersion(featurePrefix, branch)
 
-        return if(isContainer) { "${ v }-latest" } else { "${ v }-SNAPSHOT" }
+        if (vb == majorBranch) {
+            return versionFromSpecialBranch("major", isContainer, uniqueID)
+        }
+
+        val ext = if(isContainer) { "-latest" } else { "-SNAPSHOT" }
+        return "${ versionForLocalChanges( "", "local-")}${vb}${ext}"
     }
 
     private fun versionFromRelease(isContainer: Boolean) : String {
@@ -336,14 +340,11 @@ class GitVersionService @JvmOverloads constructor(
                 branch == developBranch -> {
                     rv = versionFromSpecialBranch("dev", false, buildID)
                 }
-                branch == majorBranch -> {
-                    rv = versionFromSpecialBranch("major", false, buildID)
-                }
                 branch.startsWith("${hotfixPrefix}${separator}") -> {
                     rv = versionFromHotfix(false)
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
-                    rv = versionFromFeature(false)
+                    rv = versionFromFeature(false, buildID)
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
                     rv = versionFromRelease(false)
@@ -396,9 +397,6 @@ class GitVersionService @JvmOverloads constructor(
                 branch == developBranch -> {
                     rv = versionFromSpecialBranch("dev", false, "")
                 }
-                branch == majorBranch -> {
-                    rv = versionFromSpecialBranch("major", false, "")
-                }
                 branch.startsWith("${supportPrefix}${separator}") -> {
                     rv = versionFromBranch(false, "")
                 }
@@ -406,7 +404,7 @@ class GitVersionService @JvmOverloads constructor(
                     rv = versionFromHotfix(false)
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
-                    rv = versionFromFeature(false)
+                    rv = versionFromFeature(false, "")
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
                     rv = versionFromRelease(false)
@@ -445,9 +443,6 @@ class GitVersionService @JvmOverloads constructor(
                 tag.isNotBlank() -> {
                     rv = versionForLocalChanges(tag, "${tag}-local")
                 }
-                branch == mainBranch -> {
-                    rv = versionFromBranch(true, "")
-                }
                 branch == developBranch -> {
                     rv = versionFromSpecialBranch("dev", true, "")
                 }
@@ -461,7 +456,7 @@ class GitVersionService @JvmOverloads constructor(
                     rv = versionFromHotfix(true)
                 }
                 branch.startsWith("${featurePrefix}${separator}") -> {
-                    rv = versionFromFeature(true)
+                    rv = versionFromFeature(true, "")
                 }
                 branch.startsWith("${releasePrefix}${separator}") -> {
                     rv = versionFromRelease(true)
