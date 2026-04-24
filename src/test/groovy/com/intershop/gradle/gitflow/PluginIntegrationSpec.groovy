@@ -694,7 +694,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         """.stripIndent()
 
         TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithMajor(testProjectDir, buildFileContent)
-        creator.setBranch("major")
+        creator.setBranch("feature/major")
 
         when:
         List<String> args = [':showVersion', '-i', '-s']
@@ -729,7 +729,7 @@ class PluginIntegrationSpec extends AbstractIntegrationGroovySpec {
         """.stripIndent()
 
         TestRepoCreator creator = GitCreatorSpecialPath.initGitRepoWithMajor(testProjectDir, buildFileContent)
-        creator.setBranch("major")
+        creator.setBranch("feature/major")
 
         when:
         List<String> args = [':showVersion', '-i', '-s', '-PbuildID=12356']

@@ -111,8 +111,8 @@ class GitCreatorSpecialPath {
         creator.createBranch("feature/team2/34567-message", cDevelop)
         creator.createCommits("#34567-message", 3)
 
-        creator.createBranch("major", cMaster)
-        creator.setBranch("major")
+        creator.createBranch("feature/major", cMaster)
+        creator.setBranch("feature/major")
         creator.createCommits("major", 2)
 
         return creator
