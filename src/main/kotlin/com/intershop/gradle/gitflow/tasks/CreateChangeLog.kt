@@ -37,7 +37,6 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
-import org.gradle.kotlin.dsl.provideDelegate
 import java.io.BufferedOutputStream
 import java.io.File
 import java.time.LocalDateTime
