@@ -33,7 +33,7 @@ open class GitFlowVersionPlugin: Plugin<Project> {
 
             val ext = extensions.findByType(
                 VersionExtension::class.java
-            ) ?: extensions.create(VERSION_EXTENSION_NAME, VersionExtension::class.java, this)
+            ) ?: extensions.create(VERSION_EXTENSION_NAME, VersionExtension::class.java)
 
             tasks.register("showVersion", ShowVersion::class.java)
             tasks.register("createChangeLog", CreateChangeLog::class.java) {

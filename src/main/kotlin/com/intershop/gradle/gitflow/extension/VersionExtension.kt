@@ -18,8 +18,8 @@ package com.intershop.gradle.gitflow.extension
 import com.intershop.gradle.gitflow.utils.GitVersionService
 import com.intershop.release.version.Version
 import com.intershop.release.version.VersionType
-import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -32,8 +32,7 @@ import javax.inject.Inject
  * @param layout directory layout
  * @param providerFactory provider factory for gradle
  */
-open class VersionExtension @Inject constructor(project: Project,
-                                                objectFactory: ObjectFactory,
+open class VersionExtension @Inject constructor(objectFactory: ObjectFactory,
                                                 layout: ProjectLayout,
                                                 val providerFactory: ProviderFactory ) {
 
@@ -42,6 +41,8 @@ open class VersionExtension @Inject constructor(project: Project,
          * Name for the plugin extension.
          */
         const val VERSION_EXTENSION_NAME = "gitflowVersion"
+
+        private val log = Logging.getLogger(VersionExtension::class.java)
     }
 
     private val defaultVersionProperty = objectFactory.property(String::class.java)
@@ -326,7 +327,7 @@ open class VersionExtension @Inject constructor(project: Project,
             if(versionService.buildID.isNotEmpty()) {
                 versionWithIDProperty.set(this.versionService.versionWithID)
             } else {
-                project.logger.quiet("A version with ID is requested, but the Gradle property 'buildID'" +
+                log.quiet("A version with ID is requested, but the Gradle property 'buildID'" +
                         " or the environment 'BUILD_ID' is not set.")
                 versionWithIDProperty.set(this.versionService.version)
             }

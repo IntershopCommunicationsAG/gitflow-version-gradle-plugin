@@ -19,24 +19,28 @@ package com.intershop.gradle.gitflow.tasks
 import com.intershop.gradle.gitflow.extension.VersionExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * This is an helper task to show the calculated version.
  */
-open class ShowVersion: DefaultTask() {
+@DisableCachingByDefault(because = "This task only prints the calculated version information.")
+abstract class ShowVersion: DefaultTask() {
+
+    private val versionExt: VersionExtension =
+            project.extensions.getByType(VersionExtension::class.java)
 
     /**
      * Main function of this task.
      */
     @TaskAction
     fun run() {
-        val versionExt = project.extensions.getByType(VersionExtension::class.java)
         val preVersion = versionExt.previousVersion
         val containerVersion = versionExt.containerVersion
 
         println("------------------------------------------------------------------")
         println("-- GitFlow version is")
-        println("--   " + project.version)
+        println("--   " + versionExt.version)
 
         if(containerVersion.isNotEmpty()) {
             println("-- GitFlow container version is")

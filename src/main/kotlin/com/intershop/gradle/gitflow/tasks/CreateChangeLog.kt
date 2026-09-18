@@ -37,6 +37,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
+import org.gradle.work.DisableCachingByDefault
 import java.io.BufferedOutputStream
 import java.io.File
 import java.time.LocalDateTime
@@ -45,15 +46,18 @@ import javax.inject.Inject
 /**
  * This is an helper task to show the create the changelog.
  */
-open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
-                                               projectLayout: ProjectLayout,): DefaultTask() {
+@DisableCachingByDefault(because = "The changelog depends on the Git history, which is not tracked as a task input.")
+abstract class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
+                                                   projectLayout: ProjectLayout,): DefaultTask() {
 
     companion object {
         private const val HASHLENGTH = 7
     }
 
     private val changelogFileProperty: RegularFileProperty = objectFactory.fileProperty()
-    private val prevVersionProperty: Property<String> = project.objects.property(String::class.java)
+    private val prevVersionProperty: Property<String> = objectFactory.property(String::class.java)
+    private val extension = project.extensions.getByType(VersionExtension::class.java)
+    private val repo = extension.versionService.repository
 
     init {
         description = "Creates a changelog based on Git information in Markdow format"
@@ -61,9 +65,6 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         prevVersionProperty.convention("")
         changelogFileProperty.convention(projectLayout.buildDirectory.file("changelog/changelog.md"))
     }
-
-    private val extension = project.extensions.getByType(VersionExtension::class.java)
-    private val repo = extension.versionService.repository
 
     /**
      * This is the provider for the targetVersion.
@@ -156,7 +157,7 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         try {
             parent = commit.getParent(0)
         } catch (aioe: ArrayIndexOutOfBoundsException) {
-            project.logger.info("No more parent available! ({})", aioe.message)
+            logger.info("No more parent available! ({})", aioe.message)
         }
 
         if(parent != null) {
@@ -217,9 +218,9 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         val preVersStr: String? = prevVersionProperty.orNull
 
         if(! preVersStr.isNullOrBlank()) {
-            changelogFile.appendText(getHeader(preVersStr, project.version.toString()))
+            changelogFile.appendText(getHeader(preVersStr, extension.version))
         } else {
-            changelogFile.appendText(getHeader("beginning", project.version.toString()))
+            changelogFile.appendText(getHeader("beginning", extension.version))
         }
 
         val startRevObject = if(! preVersStr.isNullOrBlank()) {
@@ -235,6 +236,6 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
             changelogFile.appendText(getMessageLine(rc.fullMessage, rc.name.substring(0, HASHLENGTH)))
             addFilesInCommit(changelogFile, rc)
         }
-        project.logger.info("Change log was written to {}", changelogFile.absolutePath)
+        logger.info("Change log was written to {}", changelogFile.absolutePath)
     }
 }
