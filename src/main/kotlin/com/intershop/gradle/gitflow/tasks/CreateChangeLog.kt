@@ -56,6 +56,7 @@ abstract class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
 
     private val changelogFileProperty: RegularFileProperty = objectFactory.fileProperty()
     private val prevVersionProperty: Property<String> = objectFactory.property(String::class.java)
+    private val projectVersionProperty: Property<String> = objectFactory.property(String::class.java)
     private val extension = project.extensions.getByType(VersionExtension::class.java)
     private val repo = extension.versionService.repository
 
@@ -70,6 +71,22 @@ abstract class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
      * This is the provider for the targetVersion.
      */
     fun providePrevVersion(prevVersion: Provider<String>) = prevVersionProperty.set(prevVersion)
+
+    /**
+     * This is the provider for the version of the project this task belongs to. It is provided by the
+     * plugin at configuration time, so that the task does not access the project during execution.
+     */
+    fun provideProjectVersion(projectVersion: Provider<String>) = projectVersionProperty.set(projectVersion)
+
+    /**
+     * The version of the project this task belongs to. It is written to the header of the changelog.
+     *
+     * @property projectVersion
+     */
+    @get:Input
+    var projectVersion: String
+        get() = projectVersionProperty.get()
+        set(value) = projectVersionProperty.set(value)
 
     /**
      * This is the property with command line option to specify
@@ -218,9 +235,9 @@ abstract class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         val preVersStr: String? = prevVersionProperty.orNull
 
         if(! preVersStr.isNullOrBlank()) {
-            changelogFile.appendText(getHeader(preVersStr, extension.version))
+            changelogFile.appendText(getHeader(preVersStr, projectVersion))
         } else {
-            changelogFile.appendText(getHeader("beginning", extension.version))
+            changelogFile.appendText(getHeader("beginning", projectVersion))
         }
 
         val startRevObject = if(! preVersStr.isNullOrBlank()) {

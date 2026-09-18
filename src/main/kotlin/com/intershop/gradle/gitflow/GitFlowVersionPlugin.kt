@@ -35,9 +35,14 @@ open class GitFlowVersionPlugin: Plugin<Project> {
                 VersionExtension::class.java
             ) ?: extensions.create(VERSION_EXTENSION_NAME, VersionExtension::class.java)
 
-            tasks.register("showVersion", ShowVersion::class.java)
+            val versionProvider = provider { version.toString() }
+
+            tasks.register("showVersion", ShowVersion::class.java) {
+                it.projectVersion.set(versionProvider)
+            }
             tasks.register("createChangeLog", CreateChangeLog::class.java) {
                 it.preVersion = ext.previousVersion
+                it.provideProjectVersion(versionProvider)
             }
         }
     }

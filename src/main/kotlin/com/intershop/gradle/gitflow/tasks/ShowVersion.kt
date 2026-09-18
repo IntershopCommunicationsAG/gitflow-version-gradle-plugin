@@ -18,6 +18,8 @@ package com.intershop.gradle.gitflow.tasks
 
 import com.intershop.gradle.gitflow.extension.VersionExtension
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 
@@ -31,6 +33,15 @@ abstract class ShowVersion: DefaultTask() {
             project.extensions.getByType(VersionExtension::class.java)
 
     /**
+     * The version of the project this task belongs to. It is provided by the plugin at
+     * configuration time, so that the task does not access the project during execution.
+     *
+     * @property projectVersion
+     */
+    @get:Internal
+    abstract val projectVersion: Property<String>
+
+    /**
      * Main function of this task.
      */
     @TaskAction
@@ -40,7 +51,7 @@ abstract class ShowVersion: DefaultTask() {
 
         println("------------------------------------------------------------------")
         println("-- GitFlow version is")
-        println("--   " + versionExt.version)
+        println("--   " + projectVersion.get())
 
         if(containerVersion.isNotEmpty()) {
             println("-- GitFlow container version is")
