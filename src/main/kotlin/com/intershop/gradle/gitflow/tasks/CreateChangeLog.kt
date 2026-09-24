@@ -37,7 +37,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
-import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.work.DisableCachingByDefault
 import java.io.BufferedOutputStream
 import java.io.File
 import java.time.LocalDateTime
@@ -46,15 +46,19 @@ import javax.inject.Inject
 /**
  * This is an helper task to show the create the changelog.
  */
-open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
-                                               projectLayout: ProjectLayout,): DefaultTask() {
+@DisableCachingByDefault(because = "The changelog depends on the Git history, which is not tracked as a task input.")
+abstract class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
+                                                   projectLayout: ProjectLayout,): DefaultTask() {
 
     companion object {
         private const val HASHLENGTH = 7
     }
 
     private val changelogFileProperty: RegularFileProperty = objectFactory.fileProperty()
-    private val prevVersionProperty: Property<String> = project.objects.property(String::class.java)
+    private val prevVersionProperty: Property<String> = objectFactory.property(String::class.java)
+    private val projectVersionProperty: Property<String> = objectFactory.property(String::class.java)
+    private val extension = project.extensions.getByType(VersionExtension::class.java)
+    private val repo = extension.versionService.repository
 
     init {
         description = "Creates a changelog based on Git information in Markdow format"
@@ -63,13 +67,26 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         changelogFileProperty.convention(projectLayout.buildDirectory.file("changelog/changelog.md"))
     }
 
-    private val extension = project.extensions.getByType(VersionExtension::class.java)
-    private val repo = extension.versionService.repository
-
     /**
      * This is the provider for the targetVersion.
      */
     fun providePrevVersion(prevVersion: Provider<String>) = prevVersionProperty.set(prevVersion)
+
+    /**
+     * This is the provider for the version of the project this task belongs to. It is provided by the
+     * plugin at configuration time, so that the task does not access the project during execution.
+     */
+    fun provideProjectVersion(projectVersion: Provider<String>) = projectVersionProperty.set(projectVersion)
+
+    /**
+     * The version of the project this task belongs to. It is written to the header of the changelog.
+     *
+     * @property projectVersion
+     */
+    @get:Input
+    var projectVersion: String
+        get() = projectVersionProperty.get()
+        set(value) = projectVersionProperty.set(value)
 
     /**
      * This is the property with command line option to specify
@@ -157,7 +174,7 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         try {
             parent = commit.getParent(0)
         } catch (aioe: ArrayIndexOutOfBoundsException) {
-            project.logger.info("No more parent available! ({})", aioe.message)
+            logger.info("No more parent available! ({})", aioe.message)
         }
 
         if(parent != null) {
@@ -218,9 +235,9 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
         val preVersStr: String? = prevVersionProperty.orNull
 
         if(! preVersStr.isNullOrBlank()) {
-            changelogFile.appendText(getHeader(preVersStr, project.version.toString()))
+            changelogFile.appendText(getHeader(preVersStr, projectVersion))
         } else {
-            changelogFile.appendText(getHeader("beginning", project.version.toString()))
+            changelogFile.appendText(getHeader("beginning", projectVersion))
         }
 
         val startRevObject = if(! preVersStr.isNullOrBlank()) {
@@ -236,6 +253,6 @@ open class CreateChangeLog @Inject constructor(objectFactory: ObjectFactory,
             changelogFile.appendText(getMessageLine(rc.fullMessage, rc.name.substring(0, HASHLENGTH)))
             addFilesInCommit(changelogFile, rc)
         }
-        project.logger.info("Change log was written to {}", changelogFile.absolutePath)
+        logger.info("Change log was written to {}", changelogFile.absolutePath)
     }
 }
